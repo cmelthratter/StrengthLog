@@ -144,7 +144,7 @@ class Entry(val date: Date = Date(),
             for (i in 0 until sets.size) {
                 sb.append("\t\t${reps[i]}x${weight[i]}")
                 if (i < sets.size - 1) sb.append(", ")
-                if (i % 3 == 0) sb.append("\n")
+                if (i % 3 == 0 && i > 1) sb.append("\n")
 
             }
 

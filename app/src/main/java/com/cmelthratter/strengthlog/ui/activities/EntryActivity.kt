@@ -45,9 +45,9 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
         currentEntry = currentLift.entries[position]
 
         val fab = findViewById(R.id.entry_fab) as FloatingActionButton
-        setsList = findViewById(R.id.sets_recyclerView) as ListView
-        repsList = findViewById(R.id.reps_recyclerView) as ListView
-        weightList = findViewById(R.id.weight_recyclerView) as ListView
+        setsList = findViewById(R.id.sets_listView) as ListView
+        repsList = findViewById(R.id.reps_listView) as ListView
+        weightList = findViewById(R.id.weight_listView) as ListView
         liftLabel = findViewById(R.id.lift_text_label) as TextView
         dateLabel = findViewById(R.id.date_textView) as TextView
 
