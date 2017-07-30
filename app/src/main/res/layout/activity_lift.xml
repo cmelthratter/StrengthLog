@@ -7,7 +7,10 @@
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
     tools:context=".ui.activities.LiftActivity">
-
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:theme="@style/Menu"
+        android:layout_height="match_parent"/>
     <TextView
         android:id="@+id/your_lifts_text"
         android:layout_width="176dp"

@@ -85,10 +85,13 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
     }
 
 
-    override fun onDialogPositiveClick(reps: Int, weight: Float) {
+    override fun onDialogPositiveClick(reps: Int?, weight: Float?) {
         setsAdapter.add(currentEntry.sets.size + 1)
-        repsAdapter.add(reps)
-        weightAdapter.add(weight)
+
+        if (reps == null) repsAdapter.add(0)
+        else repsAdapter.add(reps)
+        if (weight == null) weightAdapter.add(0.0F)
+        else weightAdapter.add(weight)
         jsonHandler.writeLifts()
 
     }

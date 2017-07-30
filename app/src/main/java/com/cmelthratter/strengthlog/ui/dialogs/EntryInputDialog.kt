@@ -49,7 +49,7 @@ class EntryInputDialog : DialogFragment() {
     }
 
     interface EntryDialogListener {
-        fun onDialogPositiveClick(reps : Int, weight: Float)
+        fun onDialogPositiveClick(reps : Int?, weight: Float?)
         fun onDialogNegativeClick()
     }
 

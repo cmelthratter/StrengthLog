@@ -26,6 +26,10 @@
         <item name="android:actionMenuTextColor">@color/actionBarText</item>
     </style>
 
+    <style name="Menu" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="textColor">@color/menuText</item>
+    </style>
+
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" >
         <item name="android:textColor">@color/actionBarText</item>
     </style>

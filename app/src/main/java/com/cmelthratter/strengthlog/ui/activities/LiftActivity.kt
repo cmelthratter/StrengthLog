@@ -13,25 +13,30 @@ import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
-import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
+import android.widget.AbsListView.MultiChoiceModeListener;
 
 import com.cmelthratter.strengthlog.R
 import com.cmelthratter.strengthlog.ui.dialogs.LiftInputDialog
 import com.cmelthratter.strengthlog.ui.dialogs.LiftInputDialog.LiftDialogListener
-import com.cmelthratter.strengthlog.util.CURRENT_LIFT_KEY
 import com.cmelthratter.strengthlog.util.JsonHandler
 import com.cmelthratter.strengthlog.util.LIFTS_KEY
-
-import com.google.gson.Gson
 
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 import kotlin.collections.ArrayList
+import android.R.menu
+import android.view.*
+import android.widget.AbsListView
+
+const val VIEW = 0
+const val EDIT =  1
+const val DELETE = 2
+
 
 /**
  * A class for representing a tracked lift,
@@ -165,6 +170,29 @@ class Entry(val date: Date = Date(),
             var liftList: ArrayList<Lift> = arrayListOf()
         }
 
+        override fun onCreateOptionsMenu(menu: Menu): Boolean {
+            val inflater = menuInflater
+            inflater.inflate(R.menu.menu, menu)
+            menu
+            return true
+        }
+        override fun onOptionsItemSelected(item: MenuItem): Boolean {
+            // Handle item selection
+            when (item.getItemId()) {
+                R.id.edit -> {
+                    choiceMode = EDIT
+                    return true
+                } R.id.delete -> {
+                choiceMode = DELETE
+                return true
+            } R.id.view -> {
+                choiceMode = VIEW
+                return true
+            }
+                else -> return super.onOptionsItemSelected(item)
+            }
+        }
+
         val TAG = LiftActivity::class.java.simpleName
         /**
          * handling positive response from the new Lift dialog
@@ -182,11 +210,11 @@ class Entry(val date: Date = Date(),
         }
 
         private lateinit var listView: ListView
-        //private var liftList : ArrayList<Lift> = arrayListOf()
         private lateinit var arrayAdapter: ArrayAdapter<Lift>
         private var permissionGranted = false
         private lateinit var prefs: SharedPreferences
         private lateinit var jsonHandler: JsonHandler
+        private var choiceMode = VIEW
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
@@ -210,12 +238,20 @@ class Entry(val date: Date = Date(),
                 startActivity(intent)
             }
             fab.setOnClickListener(View.OnClickListener { view ->
-                val liftDialog: LiftInputDialog = LiftInputDialog()
-                liftDialog.onAttach(this)
-                liftDialog.show(fragmentManager, "LiftInputDialog")
+                when(choiceMode) {
+                  VIEW -> {
+                      val liftDialog: LiftInputDialog = LiftInputDialog()
+                      liftDialog.onAttach(this)
+                      liftDialog.show(fragmentManager, "LiftInputDialog")
+                  } EDIT -> {
+
+                  } DELETE -> {
+
+                  }
+
+                }
 
             })
-
         }
 
         /**

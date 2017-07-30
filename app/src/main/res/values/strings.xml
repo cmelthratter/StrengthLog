@@ -21,4 +21,7 @@
 
     <string name="reps_editor_title">Edit Reps</string>
     <string name="reps_editor_desc">Enter different reps for this set</string>
+    <string name="edit_menu_text">Edit</string>
+    <string name="delete_menu_text">Delete</string>
+    <string name="view_menu_text">View</string>
 </resources>
