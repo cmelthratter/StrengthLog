@@ -9,7 +9,7 @@
     tools:context=".ui.activities.LiftActivity">
     <android.support.v7.widget.Toolbar
         android:layout_width="match_parent"
-        android:theme="@style/Menu"
+        android:theme="@style/AppTheme"
         android:layout_height="match_parent"/>
     <TextView
         android:id="@+id/your_lifts_text"
