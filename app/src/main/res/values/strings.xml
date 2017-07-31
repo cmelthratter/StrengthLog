@@ -28,4 +28,5 @@
     <string name="delete_dialog_desc">Are you sure you want to delete this %s</string>
     <string name="placeholder">%s</string>
     <string name="edit_lift_title">Edit Lift</string>
+    <string name="edit_date_title">Edit Date</string>
 </resources>

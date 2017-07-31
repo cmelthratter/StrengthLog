@@ -88,7 +88,7 @@ class Lift (var name: String,
  * with a Date, a list of sets corresponding to a set of reps and a set
  * of weights
  */
-class Entry(val date: Date = Date(),
+class Entry(var date: Date = Date(),
                  var sets: ArrayList<Int> = arrayListOf(),
                  var reps: ArrayList<Int> = arrayListOf(),
                  var weight: ArrayList<Float> = arrayListOf()) : Parcelable {
@@ -133,7 +133,7 @@ class Entry(val date: Date = Date(),
      * entry page
      */
     fun getFormattedDate(): String {
-        return SimpleDateFormat("EEEE, MMMM MM, yyyy", Locale.US).format(date)
+        return SimpleDateFormat("EEEE, MMMM dd, yyyy", Locale.US).format(this.date)
     }
 
     /**

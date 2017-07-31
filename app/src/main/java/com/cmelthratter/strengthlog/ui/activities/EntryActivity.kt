@@ -3,6 +3,7 @@ package com.cmelthratter.strengthlog.ui.activities
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.TextView
@@ -14,6 +15,7 @@ import com.cmelthratter.strengthlog.ui.dialogs.RepsEditorDialog
 import com.cmelthratter.strengthlog.ui.dialogs.WeightEditorDialog
 import com.cmelthratter.strengthlog.util.JsonHandler
 import com.cmelthratter.strengthlog.util.POSITION_KEY
+import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -21,6 +23,8 @@ import java.util.*
  * of entries for a specified lift
  */
 class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener, RepsEditorDialog.RepsEditorDialogListener, WeightEditorDialog.WeightEditorDialogListener{
+
+    val TAG = EntryActivity::class.java.simpleName
 
     lateinit var setsList : ListView
     lateinit var repsList : ListView
@@ -41,8 +45,8 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
         setContentView(R.layout.activity_entry)
         jsonHandler = JsonHandler()
         currentLift = LiftActivity.currentLift
-        val position = intent.getIntExtra(POSITION_KEY, 0)
-        currentEntry = currentLift.entries[position]
+        val entryPosition = intent.getIntExtra(POSITION_KEY, 0)
+        currentEntry = currentLift.entries[entryPosition]
 
         val fab = findViewById(R.id.entry_fab) as FloatingActionButton
         setsList = findViewById(R.id.sets_listView) as ListView
@@ -73,10 +77,11 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
         weightList.adapter = weightAdapter
 
         liftLabel.text = currentLift.name
-        val date = Calendar.getInstance()
-        date.time = currentEntry.date
 
-        dateLabel.text = currentEntry.getFormattedDate()
+        dateLabel.text = String.format(getString(R.string.date_label),
+                currentEntry.getFormattedDate())
+        log("$currentEntry")
+        log("$entryPosition")
         fab.setOnClickListener { view ->
             val dialog = EntryInputDialog()
             dialog.show(fragmentManager, "EntryInputDialog")
@@ -109,6 +114,10 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
 
     override fun onDialogNegativeClick() {
         toast("Canceled input")
+    }
+
+    private fun log(msg : String) {
+        Log.i(TAG, msg)
     }
 
     private fun toast(msg: String) {

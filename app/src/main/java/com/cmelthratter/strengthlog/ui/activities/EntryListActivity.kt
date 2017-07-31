@@ -1,26 +1,68 @@
 package com.cmelthratter.strengthlog.ui.activities
 
+import android.annotation.TargetApi
+import android.app.DatePickerDialog
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
 
 import com.cmelthratter.strengthlog.R
+import com.cmelthratter.strengthlog.ui.dialogs.DeleteConfirmDialog
 import com.cmelthratter.strengthlog.util.*
 import java.util.*
 
-class EntryListActivity : AppCompatActivity() {
+
+class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogListener {
+    override fun onDialogPositiveClick() {
+        LiftActivity.currentLift.entries.removeAt(currentPosition)
+        arrayAdapter.notifyDataSetChanged()
+        jsonHandler.writeLifts()
+        choiceMode = VIEW
+    }
+
+    override fun onDialogNegativeClick() {
+        //do nothing
+    }
 
     lateinit var entryListView : ListView
     lateinit var arrayAdapter : ArrayAdapter<Entry>
     lateinit var jsonHandler : JsonHandler
+    var currentPosition = 0
+    var choiceMode = VIEW
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.menu, menu)
+        return true
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle item selection
+        when (item.itemId) {
+            R.id.edit -> {
+                choiceMode = EDIT
+                toast("Choose an entry to edit its date")
+                return true
+            } R.id.delete -> {
+                choiceMode = DELETE
+                toast("Choose an entry to delete it")
+                return true
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
+
+    @TargetApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry_list)
@@ -37,12 +79,36 @@ class EntryListActivity : AppCompatActivity() {
         val fab = findViewById(R.id.fab) as FloatingActionButton
 
         entryListView.setOnItemClickListener { parent, view, position, id ->
-            var intent = Intent(this, EntryActivity::class.java)
-            //intent.putExtra(CURRENT_LIFT_KEY, currentLift)
-            intent.putExtra(POSITION_KEY, position)
-            //intent.putExtra(CURRENT_ENTRY_KEY, currentLift.entries[position])
-            jsonHandler.writeLifts()
-            startActivity(intent)
+            currentPosition = position
+            when (choiceMode) {
+
+                VIEW -> {
+                    var intent = Intent(this, EntryActivity::class.java)
+                    intent.putExtra(POSITION_KEY, position)
+                    jsonHandler.writeLifts()
+                    startActivity(intent)
+                }
+                EDIT -> {
+                    val datePickerDialog = DatePickerDialog(this, R.style.AppTheme_AppBarOverlay)
+                    datePickerDialog.setOnDateSetListener { view, year, month, dayOfMonth ->
+                        val calendar = GregorianCalendar(year, month, dayOfMonth)
+                        LiftActivity.currentLift.entries[position].date = Date(calendar.timeInMillis)
+                        arrayAdapter.notifyDataSetChanged()
+
+                        choiceMode = VIEW
+                    }
+
+                    datePickerDialog.setTitle(R.string.edit_date_title)
+
+                    datePickerDialog.show()
+                }
+                DELETE -> {
+                    val deleteDialog = DeleteConfirmDialog()
+                    deleteDialog.onAttach(this)
+                    deleteDialog.show(fragmentManager, "DeleteConfirmDialog")
+                }
+            }
+
         }
         fab.setOnClickListener(View.OnClickListener { view ->
             addEntry()
@@ -56,6 +122,7 @@ class EntryListActivity : AppCompatActivity() {
         val entry = Entry()
 
         arrayAdapter.add(entry)
+        arrayAdapter.notifyDataSetChanged()
         jsonHandler.writeLifts()
         log("adding entry: $entry, ${LiftActivity.currentLift.entries}")
     }
@@ -64,4 +131,7 @@ class EntryListActivity : AppCompatActivity() {
         Log.i(LiftActivity::class.java.simpleName, msg)
     }
 
+    private fun toast(msg: String) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    }
 }
