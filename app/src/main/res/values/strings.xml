@@ -24,4 +24,8 @@
     <string name="edit_menu_text">Edit</string>
     <string name="delete_menu_text">Delete</string>
     <string name="view_menu_text">View</string>
+    <string name="delete_dialog_title">Delete %s</string>
+    <string name="delete_dialog_desc">Are you sure you want to delete this %s</string>
+    <string name="placeholder">%s</string>
+    <string name="edit_lift_title">Edit Lift</string>
 </resources>

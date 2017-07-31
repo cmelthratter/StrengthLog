@@ -32,6 +32,7 @@ import kotlin.collections.ArrayList
 import android.R.menu
 import android.view.*
 import android.widget.AbsListView
+import com.cmelthratter.strengthlog.ui.dialogs.DeleteConfirmDialog
 
 const val VIEW = 0
 const val EDIT =  1
@@ -158,7 +159,7 @@ class Entry(val date: Date = Date(),
     }
 }
 
-    class LiftActivity : AppCompatActivity(), LiftDialogListener {
+    class LiftActivity : AppCompatActivity(), LiftDialogListener, DeleteConfirmDialog.DeleteDialogListener {
         /**
          * for holding the data transferred between activities.
          * Transferring it as Parcelable resulted in
@@ -173,7 +174,6 @@ class Entry(val date: Date = Date(),
         override fun onCreateOptionsMenu(menu: Menu): Boolean {
             val inflater = menuInflater
             inflater.inflate(R.menu.menu, menu)
-            menu
             return true
         }
         override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -181,14 +181,13 @@ class Entry(val date: Date = Date(),
             when (item.getItemId()) {
                 R.id.edit -> {
                     choiceMode = EDIT
+                    toast("Choose a lift to edit its name")
                     return true
                 } R.id.delete -> {
-                choiceMode = DELETE
-                return true
-            } R.id.view -> {
-                choiceMode = VIEW
-                return true
-            }
+                    choiceMode = DELETE
+                    toast("Choose a lift to delete it")
+                    return true
+                }
                 else -> return super.onOptionsItemSelected(item)
             }
         }
@@ -197,9 +196,14 @@ class Entry(val date: Date = Date(),
         /**
          * handling positive response from the new Lift dialog
          */
-        override fun onDialogPositiveClick(newLift: String) {
+        override fun onDialogPositiveClick(newLift: String, isNewLift: Boolean) {
             log("positive click: $newLift")
-            addLift(newLift)
+            if (isNewLift)
+                addLift(newLift)
+            else
+                changeLiftName(currentLift, newLift)
+
+            choiceMode = VIEW
         }
 
         /**
@@ -207,6 +211,7 @@ class Entry(val date: Date = Date(),
          */
         override fun onDialogNegativeClick(dialog: DialogFragment) {
             Toast.makeText(baseContext, "Canceled", Toast.LENGTH_SHORT).show()
+            choiceMode = VIEW
         }
 
         private lateinit var listView: ListView
@@ -230,27 +235,32 @@ class Entry(val date: Date = Date(),
 
             requestPermissions()
             listView.setOnItemClickListener { parent, view, position, id ->
-
-                val intent = Intent(this@LiftActivity, EntryListActivity::class.java)
-                //intent.putExtra(CURRENT_LIFT_KEY, liftList[position])
-
                 LiftActivity.currentLift = LiftActivity.liftList[position]
-                startActivity(intent)
+                when(choiceMode) {
+                    VIEW -> {
+                        val intent = Intent(this@LiftActivity, EntryListActivity::class.java)
+                        //intent.putExtra(CURRENT_LIFT_KEY, liftList[position])
+
+                        startActivity(intent)
+                    }
+                    EDIT -> {
+                        val liftDialog: LiftInputDialog = LiftInputDialog(false, LiftActivity.currentLift.name)
+                        liftDialog.onAttach(this)
+                        liftDialog.show(fragmentManager, "LiftInputDialog")
+                    }
+                    DELETE -> {
+                        val deleteDialog = DeleteConfirmDialog()
+                        deleteDialog.onAttach(this)
+                        deleteDialog.show(fragmentManager, "DeleteConfirmDialog")
+
+                    }
+                }
             }
             fab.setOnClickListener(View.OnClickListener { view ->
-                when(choiceMode) {
-                  VIEW -> {
-                      val liftDialog: LiftInputDialog = LiftInputDialog()
-                      liftDialog.onAttach(this)
-                      liftDialog.show(fragmentManager, "LiftInputDialog")
-                  } EDIT -> {
 
-                  } DELETE -> {
-
-                  }
-
-                }
-
+                val liftDialog: LiftInputDialog = LiftInputDialog()
+                liftDialog.onAttach(this)
+                liftDialog.show(fragmentManager, "LiftInputDialog")
             })
         }
 
@@ -274,6 +284,16 @@ class Entry(val date: Date = Date(),
                     return
                 }
             }
+        }
+
+        override fun onDialogNegativeClick() {
+            toast("Canceled delete")
+            choiceMode = VIEW
+        }
+
+        override fun onDialogPositiveClick() {
+            removeLift(currentLift)
+            choiceMode = VIEW
         }
 
 
@@ -303,7 +323,8 @@ class Entry(val date: Date = Date(),
          * @param newName  the new name to change the lift name to
          */
         fun changeLiftName(lift: Lift, newName: String) {
-            arrayAdapter.getItem(liftList.indexOf(lift)).name = newName
+            liftList[liftList.indexOf(lift)].name = newName
+            arrayAdapter.notifyDataSetChanged()
         }
 
         /**
@@ -328,6 +349,7 @@ class Entry(val date: Date = Date(),
         private fun removeLift(lift: Lift) {
             log("removing lift $lift")
             liftList.remove(lift)
+            arrayAdapter.notifyDataSetChanged()
             jsonHandler.writeLifts()
         }
 
