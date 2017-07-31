@@ -19,8 +19,10 @@ import com.cmelthratter.strengthlog.R
  */
 
 
-class EntryInputDialog : DialogFragment() {
+class EntryInputDialog(val repsPlaceHolder: Int = 0, val weightPlaceHolder: Float = 0.0F) : DialogFragment() {
 
+    lateinit var reps : EditText
+    lateinit var weight : EditText
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         log("Dialog created")
         val builder = AlertDialog.Builder(activity, R.style.DialogFragment)
@@ -34,8 +36,7 @@ class EntryInputDialog : DialogFragment() {
         builder.setMessage(R.string.entry_input_desc)
                 .setPositiveButton(R.string.lift_dialog_submit, DialogInterface.OnClickListener { _, _ ->
                     log("Positive button clicked")
-                    val reps = this@EntryInputDialog.dialog.findViewById(R.id.reps_editText) as EditText
-                    val weight = this@EntryInputDialog.dialog.findViewById(R.id.weight_editText) as EditText
+
                     mListener!!.onDialogPositiveClick(reps.text.toString().toInt(), weight.text.toString().toFloat() )
 
                 })
@@ -46,6 +47,15 @@ class EntryInputDialog : DialogFragment() {
         // Create the AlertDialog object and return it
         return builder.create()
 
+    }
+
+    override fun onStart() {
+        super.onStart()
+        reps = this.dialog.findViewById(R.id.reps_editText) as EditText
+        weight = this.dialog.findViewById(R.id.weight_editText) as EditText
+
+        reps.setText(repsPlaceHolder.toString())
+        weight.setText(weightPlaceHolder.toString())
     }
 
     interface EntryDialogListener {

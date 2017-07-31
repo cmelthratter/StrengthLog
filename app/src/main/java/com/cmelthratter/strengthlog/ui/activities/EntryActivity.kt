@@ -83,7 +83,11 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
         log("$currentEntry")
         log("$entryPosition")
         fab.setOnClickListener { view ->
-            val dialog = EntryInputDialog()
+            var repsPlaceholder = 0
+            var weightPlaceholder = 0.0F
+            if (currentEntry.reps.isNotEmpty()) repsPlaceholder = currentEntry.reps.last()
+            if (currentEntry.weight.isNotEmpty()) weightPlaceholder = currentEntry.weight.last()
+            val dialog = EntryInputDialog(repsPlaceholder, weightPlaceholder)
             dialog.show(fragmentManager, "EntryInputDialog")
 
         }
