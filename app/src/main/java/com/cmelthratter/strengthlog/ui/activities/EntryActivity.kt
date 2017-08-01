@@ -3,11 +3,9 @@ package com.cmelthratter.strengthlog.ui.activities
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.util.Log
-import android.widget.ArrayAdapter
-import android.widget.ListView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 
 import com.cmelthratter.strengthlog.R
 import com.cmelthratter.strengthlog.ui.dialogs.EntryInputDialog
@@ -29,7 +27,6 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
     lateinit var setsList : ListView
     lateinit var repsList : ListView
     lateinit var weightList : ListView
-    lateinit var liftLabel : TextView
     lateinit var dateLabel : TextView
     lateinit var currentLift : Lift
     lateinit var currentEntry : Entry
@@ -52,8 +49,11 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
         setsList = findViewById(R.id.sets_listView) as ListView
         repsList = findViewById(R.id.reps_listView) as ListView
         weightList = findViewById(R.id.weight_listView) as ListView
-        liftLabel = findViewById(R.id.lift_text_label) as TextView
-        dateLabel = findViewById(R.id.date_textView) as TextView
+        dateLabel = findViewById(R.id.date_text_label) as TextView
+        val toolbar = findViewById(R.id.entry_toolbar) as Toolbar
+        toolbar.title = LiftActivity.currentLift.name
+        setSupportActionBar(toolbar)
+
 
         repsList.setOnItemClickListener { parent, view, position, id ->
 
@@ -76,8 +76,6 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
         repsList.adapter = repsAdapter
         weightList.adapter = weightAdapter
 
-        liftLabel.text = currentLift.name
-
         dateLabel.text = String.format(getString(R.string.date_label),
                 currentEntry.getFormattedDate())
         log("$currentEntry")
@@ -91,6 +89,11 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
             dialog.show(fragmentManager, "EntryInputDialog")
 
         }
+    }
+
+    override fun onBackPressed() {
+
+        super.onBackPressed()
     }
 
 

@@ -8,7 +8,7 @@
     <string name="lift_input_dialog_message">Enter a name for you new lift to track</string>
     <string name="lift_input_dialog_title">New Lift</string>
     <string name="lift_input_box">lift name</string>
-    <string name="title_activity_entry">Log</string>
+    <string name="title_activity_entry">%s</string>
     <string name="entry_set_label">Set</string>
     <string name="entry_reps_label">Reps</string>
     <string name="entry_weight_label">Weight</string>

@@ -355,6 +355,7 @@ class Entry(var date: Date = Date(),
             log("Adding lift: $liftName")
             val lift = Lift(liftName)
             liftList.add(lift)
+            arrayAdapter.notifyDataSetChanged()
             jsonHandler.writeLifts()
         }
 

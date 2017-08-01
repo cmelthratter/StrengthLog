@@ -26,6 +26,13 @@
         <item name="colorAccent">@color/actionBarText</item>
         <item name="android:textColor">@color/actionBarText</item>
         <item name="android:actionMenuTextColor">@color/actionBarText</item>
+        <item name="android:itemBackground">@color/colorPrimaryDark</item>
+        <item name="android:title">@string/lift_label</item>
+    </style>
+    <style name="AppTheme.EntryTheme" parent="AppTheme.AppBarOverlay">
+        <item name="android:title">@string/lift_label</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 
 

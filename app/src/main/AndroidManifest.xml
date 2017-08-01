@@ -25,11 +25,12 @@
             android:name=".ui.activities.EntryListActivity"
             android:label="@string/title_activity_entry_list"
             android:parentActivityName=".ui.activities.LiftActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.EntryTheme" />
         <activity
             android:name=".ui.activities.EntryActivity"
+            android:parentActivityName=".ui.activities.EntryListActivity"
             android:label="@string/title_activity_entry"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.EntryTheme" />
     </application>
 
 </manifest>

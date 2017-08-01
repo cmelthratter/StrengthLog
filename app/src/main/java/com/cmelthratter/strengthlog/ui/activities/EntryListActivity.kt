@@ -39,6 +39,7 @@ class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogL
     lateinit var jsonHandler : JsonHandler
     var currentPosition = 0
     var choiceMode = VIEW
+    var currentItem : MenuItem? = null
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
@@ -47,14 +48,23 @@ class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogL
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle item selection
+
         when (item.itemId) {
             R.id.edit -> {
+                currentItem = item
                 choiceMode = EDIT
                 toast("Choose an entry to edit its date")
+                currentItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
                 return true
             } R.id.delete -> {
+            currentItem = item
                 choiceMode = DELETE
                 toast("Choose an entry to delete it")
+                currentItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+                return true
+            } R.id.backup -> {
+                jsonHandler.writeLifts(true)
+                toast("Backing up lifts data file..")
                 return true
             }
             else -> return super.onOptionsItemSelected(item)
@@ -67,7 +77,7 @@ class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogL
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry_list)
         jsonHandler = JsonHandler()
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
+        val toolbar = findViewById(R.id.entry_list_toolbar) as Toolbar
 
         toolbar.title = String.format(Locale.US, getString(R.string.title_activity_entry_list), LiftActivity.currentLift.name)
         setSupportActionBar(toolbar)
@@ -96,6 +106,7 @@ class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogL
                         arrayAdapter.notifyDataSetChanged()
 
                         choiceMode = VIEW
+                        currentItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT)
                     }
 
                     datePickerDialog.setTitle(R.string.edit_date_title)
@@ -106,10 +117,12 @@ class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogL
                     val deleteDialog = DeleteConfirmDialog()
                     deleteDialog.onAttach(this)
                     deleteDialog.show(fragmentManager, "DeleteConfirmDialog")
+                    currentItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT)
                 }
             }
 
         }
+        arrayAdapter.notifyDataSetChanged()
         fab.setOnClickListener(View.OnClickListener { view ->
             addEntry()
             Toast.makeText(this, "New entry added for ${LiftActivity.currentLift}", Toast.LENGTH_SHORT).show()
@@ -121,7 +134,7 @@ class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogL
 
         val entry = Entry()
 
-        arrayAdapter.add(entry)
+        arrayAdapter.insert(entry, 0)
         arrayAdapter.notifyDataSetChanged()
         jsonHandler.writeLifts()
         log("adding entry: $entry, ${LiftActivity.currentLift.entries}")
