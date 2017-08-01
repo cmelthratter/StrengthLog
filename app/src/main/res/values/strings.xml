@@ -29,4 +29,5 @@
     <string name="placeholder">%s</string>
     <string name="edit_lift_title">Edit Lift</string>
     <string name="edit_date_title">Edit Date</string>
+    <string name="backup_menu_text">Backup</string>
 </resources>

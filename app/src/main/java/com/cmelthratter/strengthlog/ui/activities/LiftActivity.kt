@@ -30,6 +30,7 @@ import java.util.*
 
 import kotlin.collections.ArrayList
 import android.R.menu
+import android.support.v7.widget.Toolbar
 import android.view.*
 import android.widget.AbsListView
 import com.cmelthratter.strengthlog.ui.dialogs.DeleteConfirmDialog
@@ -171,25 +172,42 @@ class Entry(var date: Date = Date(),
             var liftList: ArrayList<Lift> = arrayListOf()
         }
 
+        private lateinit var listView: ListView
+        private lateinit var arrayAdapter: ArrayAdapter<Lift>
+        private var permissionGranted = false
+        private lateinit var prefs: SharedPreferences
+        private lateinit var jsonHandler: JsonHandler
+        private var choiceMode = VIEW
+        private var currentMenuItem : MenuItem? = null
+
         override fun onCreateOptionsMenu(menu: Menu): Boolean {
             val inflater = menuInflater
             inflater.inflate(R.menu.menu, menu)
+
             return true
         }
         override fun onOptionsItemSelected(item: MenuItem): Boolean {
             // Handle item selection
-            when (item.getItemId()) {
+            currentMenuItem = item
+            if (item.itemId != R.id.backup)
+                item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+            when (item.itemId) {
                 R.id.edit -> {
                     choiceMode = EDIT
+
                     toast("Choose a lift to edit its name")
                     return true
                 } R.id.delete -> {
                     choiceMode = DELETE
-                    toast("Choose a lift to delete it")
+                    toast("Choose a lift to delete it" )
                     return true
-                }
+                } R.id.backup -> {
+                    jsonHandler.writeLifts(true)
+                    toast("Backing up lifts data file..")
+            }
                 else -> return super.onOptionsItemSelected(item)
             }
+            return false
         }
 
         val TAG = LiftActivity::class.java.simpleName
@@ -204,6 +222,7 @@ class Entry(var date: Date = Date(),
                 changeLiftName(currentLift, newLift)
 
             choiceMode = VIEW
+            currentMenuItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT)
         }
 
         /**
@@ -212,14 +231,9 @@ class Entry(var date: Date = Date(),
         override fun onDialogNegativeClick(dialog: DialogFragment) {
             Toast.makeText(baseContext, "Canceled", Toast.LENGTH_SHORT).show()
             choiceMode = VIEW
+            currentMenuItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT)
         }
 
-        private lateinit var listView: ListView
-        private lateinit var arrayAdapter: ArrayAdapter<Lift>
-        private var permissionGranted = false
-        private lateinit var prefs: SharedPreferences
-        private lateinit var jsonHandler: JsonHandler
-        private var choiceMode = VIEW
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
@@ -228,7 +242,7 @@ class Entry(var date: Date = Date(),
             listView = this.findViewById(R.id.lift_list) as ListView
             prefs = getSharedPreferences(LIFTS_KEY, 0)
             val fab = findViewById(R.id.fab_lift) as FloatingActionButton
-
+            val toolbar = findViewById(R.id.toolbar) as Toolbar
             arrayAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, LiftActivity.liftList)
             arrayAdapter.setNotifyOnChange(true)
             listView.adapter = arrayAdapter
@@ -289,11 +303,15 @@ class Entry(var date: Date = Date(),
         override fun onDialogNegativeClick() {
             toast("Canceled delete")
             choiceMode = VIEW
+
+            currentMenuItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT)
         }
 
         override fun onDialogPositiveClick() {
             removeLift(currentLift)
             choiceMode = VIEW
+
+            currentMenuItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT)
         }
 
 

@@ -7,10 +7,12 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColor">@color/actionBarText</item>
+        <item name="android:itemBackground">@color/colorPrimaryDark</item>
     </style>
 
-    <style name="ActionBarTheme" parent="@android:style/Theme.Holo.Light">
+    <style name="ActionBarTheme" parent="@android:style/Widget.ActionBar">
         <item name="android:textColor">@color/actionBarText</item>
+        <item name="android:background">@color/colorPrimaryDark</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -24,6 +26,15 @@
         <item name="colorAccent">@color/actionBarText</item>
         <item name="android:textColor">@color/actionBarText</item>
         <item name="android:actionMenuTextColor">@color/actionBarText</item>
+    </style>
+
+
+    <style name="MenuTheme" parent="Theme.AppCompat">
+        <item name="android:itemTextAppearance">@style/TextAppearance</item>
+    </style>
+
+    <style name="TextAppearance">
+        <item name="android:textColor">@android:color/black</item>
     </style>
 
 

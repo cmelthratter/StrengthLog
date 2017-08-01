@@ -5,9 +5,15 @@
     <item
         android:id="@+id/edit"
         android:title="@string/edit_menu_text"
-        app:showAsAction="ifRoom" />
+        android:visible="true" />
     <item
         android:id="@+id/delete"
+        android:enabled="true"
         android:title="@string/delete_menu_text"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="withText" />
+    <item
+        android:id="@+id/backup"
+        android:enabled="true"
+        android:title="@string/backup_menu_text"
+        />
 </menu>

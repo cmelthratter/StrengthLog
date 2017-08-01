@@ -22,8 +22,9 @@ class JsonHandler(val file : File = File(Environment.getExternalStorageDirectory
      * to the result from file
      */
     fun readLifts()  {
+
         log("reading lifts")
-        var reader : Scanner? = null
+        var reader: Scanner? = null
         try {
             if (!file.exists()) {
                 log("no file to read")
@@ -35,11 +36,13 @@ class JsonHandler(val file : File = File(Environment.getExternalStorageDirectory
             val array = gson.fromJson(data, arrayOf<Lift>()::class.java)
             log("loadedlist: $array")
             LiftActivity.liftList.addAll(array)
-        }catch (e : Exception) {
+        } catch (e: Exception) {
             Log.e(TAG, e.message)
         } finally {
             reader!!.close()
+
         }
+
     }
 
     /**
@@ -47,6 +50,7 @@ class JsonHandler(val file : File = File(Environment.getExternalStorageDirectory
      * @param backup true if writing to backup file, false otherwise
      */
     fun writeLifts(backup : Boolean = false) {
+
         var writer: PrintWriter? = null
         try {
             if (backup) writer = PrintWriter(FileOutputStream(backupFile, false))
@@ -57,11 +61,12 @@ class JsonHandler(val file : File = File(Environment.getExternalStorageDirectory
             val data = gson.toJson(LiftActivity.liftList.toArray())
             log("Writing string: $data")
             writer.println(data)
-        }catch (e : Exception) {
+        } catch (e: Exception) {
             Log.e(TAG, e.message)
         } finally {
             writer!!.close()
         }
+
     }
 
     private fun log(msg: String) {
