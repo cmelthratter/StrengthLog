@@ -122,11 +122,16 @@ class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogL
             }
 
         }
-        arrayAdapter.notifyDataSetChanged()
         fab.setOnClickListener(View.OnClickListener { view ->
             addEntry()
             Toast.makeText(this, "New entry added for ${LiftActivity.currentLift}", Toast.LENGTH_SHORT).show()
         })
+    }
+
+    override fun onStart() {
+        super.onStart()
+        log("Activity started")
+        arrayAdapter.notifyDataSetChanged()
     }
 
 
