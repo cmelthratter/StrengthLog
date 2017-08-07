@@ -147,12 +147,21 @@ class Entry(var date: Date = Date(),
             if (sets.isNotEmpty())
                 sb.append("\t\t\t${reps[0]}x${sets.size}x${weight[0]}")
         } else {
-
+            var eqRepsSum = 1
             for (i in 0 until sets.size) {
-                sb.append("\t\t${reps[i]}x${weight[i]}")
-                if (i < sets.size - 1) sb.append(", ")
-                if (i % 3 == 0 && i > 1) sb.append("\n")
+                if(i == sets.size - 1) {
+                    //if (reps[i] == reps[i - 1] && weight[i] == weight[i - 1])
+                        sb.append("\t\t${eqRepsSum++}x${reps[i]}x${weight[i]}")
 
+                } else if((reps[i] == reps[i + 1]) && (weight[i + 1] == weight[i])) {
+                    eqRepsSum++
+                } else {
+
+                    sb.append("\t\t${eqRepsSum}x${reps[i]}x${weight[i]}")
+                    if (i < sets.size - 1) sb.append(", ")
+                    if (i % 3 == 0 && i > 1) sb.append("\n")
+                    eqRepsSum = 1
+                }
             }
 
         }
