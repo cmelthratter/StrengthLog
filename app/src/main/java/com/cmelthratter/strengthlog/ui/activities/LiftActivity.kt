@@ -151,13 +151,13 @@ class Entry(var date: Date = Date(),
             for (i in 0 until sets.size) {
                 if(i == sets.size - 1) {
                     //if (reps[i] == reps[i - 1] && weight[i] == weight[i - 1])
-                        sb.append("\t\t${eqRepsSum++}x${reps[i]}x${weight[i]}")
+                        sb.append("\t\t${reps[i]}x${eqRepsSum++}x${weight[i]}")
 
                 } else if((reps[i] == reps[i + 1]) && (weight[i + 1] == weight[i])) {
                     eqRepsSum++
                 } else {
 
-                    sb.append("\t\t${eqRepsSum}x${reps[i]}x${weight[i]}")
+                    sb.append("\t\t${reps[i]}x${eqRepsSum}x${weight[i]}")
                     if (i < sets.size - 1) sb.append(", ")
                     if (i % 3 == 0 && i > 1) sb.append("\n")
                     eqRepsSum = 1

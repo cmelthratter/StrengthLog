@@ -5,7 +5,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@android:color/holo_green_light</item>
         <item name="android:textColor">@color/actionBarText</item>
         <item name="android:itemBackground">@color/colorPrimaryDark</item>
     </style>
@@ -23,7 +23,7 @@
     <style name="AppTheme.AppBarOverlay" parent="Theme.AppCompat">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/actionBarText</item>
+        <item name="colorAccent">@android:color/holo_green_light</item>
         <item name="android:textColor">@color/actionBarText</item>
         <item name="android:actionMenuTextColor">@color/actionBarText</item>
         <item name="android:itemBackground">@color/colorPrimaryDark</item>
