@@ -142,7 +142,7 @@ class Entry(var date: Date = Date(),
      * depending on the reps and weight for each set
      */
     override fun toString(): String {
-        val sb = StringBuilder(SimpleDateFormat("MM-dd-yy", Locale.US).format(date)).append(":")
+        val sb = StringBuilder(SimpleDateFormat("MM-dd-yy", Locale.US).format(date)).append(":\n")
         if (weight.all { i -> i == weight[0] } && reps.all { i -> reps[0] == i }) {
             if (sets.isNotEmpty())
                 sb.append("\t\t\t${reps[0]}x${sets.size}x${weight[0]}")
@@ -150,16 +150,16 @@ class Entry(var date: Date = Date(),
             var eqRepsSum = 1
             for (i in 0 until sets.size) {
                 if(i == sets.size - 1) {
-                    //if (reps[i] == reps[i - 1] && weight[i] == weight[i - 1])
+                    if (reps[i] == reps[i - 1] && weight[i] == weight[i - 1])
                         sb.append("\t\t${reps[i]}x${eqRepsSum++}x${weight[i]}")
+                    else
+                        sb.append("\t\t${reps[i]}x1x${weight[i]}")
 
                 } else if((reps[i] == reps[i + 1]) && (weight[i + 1] == weight[i])) {
                     eqRepsSum++
                 } else {
 
-                    sb.append("\t\t${reps[i]}x${eqRepsSum}x${weight[i]}")
-                    if (i < sets.size - 1) sb.append(", ")
-                    if (i % 3 == 0 && i > 1) sb.append("\n")
+                    sb.append("\t\t${reps[i]}x${eqRepsSum}x${weight[i]}\n")
                     eqRepsSum = 1
                 }
             }
