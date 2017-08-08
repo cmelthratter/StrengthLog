@@ -12,7 +12,7 @@ import com.cmelthratter.strengthlog.R
 import android.app.Activity
 import android.util.Log
 import android.view.LayoutInflater
-
+import com.cmelthratter.strengthlog.ui.activities.RPE
 
 
 /**
@@ -36,8 +36,11 @@ class RepsEditorDialog : DialogFragment() {
                 .setPositiveButton(R.string.lift_dialog_submit, DialogInterface.OnClickListener { _, _ ->
                     log("Positive button clicked")
                     val textInput = dialog.findViewById(R.id.reps_editor_editText) as EditText
-                    mListener!!.onDialogPositiveClick(textInput.text.toString().toInt())
-
+                    try {
+                        mListener!!.onDialogPositiveClick(textInput.text.toString().toInt())
+                    } catch(e: NumberFormatException) {
+                        mListener!!.onDialogPositiveClick(0)
+                    }
                 })
                 .setNegativeButton(R.string.lift_dialog_cancel, DialogInterface.OnClickListener { dialog, _ ->
                     // User cancelled the dialog
@@ -49,7 +52,7 @@ class RepsEditorDialog : DialogFragment() {
     }
 
     interface RepsEditorDialogListener {
-        fun onDialogPositiveClick(newReps : Int)
+        fun onDialogPositiveClick(newVal : Int)
         fun onDialogNegativeClick()
     }
 

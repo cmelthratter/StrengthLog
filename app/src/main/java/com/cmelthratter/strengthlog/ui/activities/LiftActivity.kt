@@ -16,7 +16,6 @@ import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
-import android.widget.AbsListView.MultiChoiceModeListener;
 
 import com.cmelthratter.strengthlog.R
 import com.cmelthratter.strengthlog.ui.dialogs.LiftInputDialog
@@ -29,10 +28,8 @@ import java.util.*
 
 
 import kotlin.collections.ArrayList
-import android.R.menu
 import android.support.v7.widget.Toolbar
 import android.view.*
-import android.widget.AbsListView
 import com.cmelthratter.strengthlog.ui.dialogs.DeleteConfirmDialog
 
 const val VIEW = 0
@@ -90,27 +87,27 @@ class Lift (var name: String,
  * of weights
  */
 class Entry(var date: Date = Date(),
-                 var sets: ArrayList<Int> = arrayListOf(),
-                 var reps: ArrayList<Int> = arrayListOf(),
-                 var weight: ArrayList<Float> = arrayListOf()) : Parcelable {
+            var rpe: ArrayList<Float> = arrayListOf(),
+            var reps: ArrayList<Int> = arrayListOf(),
+            var weight: ArrayList<Float> = arrayListOf()) : Parcelable {
     constructor(parcel: Parcel) : this(
             Date(parcel.readLong())) {
-        val setsArray: IntArray? = null
+        val rpeArray: FloatArray? = null
         val weightArray: FloatArray? = null
         val repsArray: IntArray? = null
 
-        parcel.readIntArray(setsArray)
+        parcel.readFloatArray(rpeArray)
         parcel.readIntArray(repsArray)
         parcel.readFloatArray(weightArray)
 
-        sets.addAll(setsArray!!.toTypedArray())
+        rpe.addAll(rpeArray!!.toTypedArray())
         weight.addAll(weightArray!!.toTypedArray())
         reps.addAll(repsArray!!.toTypedArray())
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeLong(date.time)
-        parcel.writeIntArray(sets.toIntArray())
+        parcel.writeFloatArray(rpe.toFloatArray())
         parcel.writeIntArray(reps.toIntArray())
         parcel.writeFloatArray(weight.toFloatArray())
     }
@@ -143,23 +140,23 @@ class Entry(var date: Date = Date(),
      */
     override fun toString(): String {
         val sb = StringBuilder(SimpleDateFormat("MM-dd-yy", Locale.US).format(date)).append(":\n")
-        if (weight.all { i -> i == weight[0] } && reps.all { i -> reps[0] == i }) {
-            if (sets.isNotEmpty())
-                sb.append("\t\t\t${reps[0]}x${sets.size}x${weight[0]}")
+        if (weight.all { i -> i == weight[0] } && reps.all { i -> reps[0] == i } || reps.size == 1) {
+            if (rpe.isNotEmpty())
+                sb.append("\t\t\t${reps[0]}x${reps.size}x${weight[0]} @ ${rpe[0]}")
         } else {
             var eqRepsSum = 1
-            for (i in 0 until sets.size) {
-                if(i == sets.size - 1) {
-                    if (reps[i] == reps[i - 1] && weight[i] == weight[i - 1])
-                        sb.append("\t\t${reps[i]}x${eqRepsSum++}x${weight[i]}")
+            for (i in 0 until rpe.size) {
+                if(i == rpe.size - 1) {
+                    if (reps[i] == reps[i - 1] && weight[i] == weight[i - 1] && rpe[i] == rpe[i - 1])
+                        sb.append("\t\t${reps[i]}x${eqRepsSum++}x${weight[i]} @ ${rpe[i]}")
                     else
-                        sb.append("\t\t${reps[i]}x1x${weight[i]}")
+                        sb.append("\t\t${reps[i]}x1x${weight[i]} @ ${rpe[i]}")
 
-                } else if((reps[i] == reps[i + 1]) && (weight[i + 1] == weight[i])) {
+                } else if((reps[i] == reps[i + 1]) && (weight[i + 1] == weight[i]) && rpe[i] == rpe[i + 1]) {
                     eqRepsSum++
                 } else {
 
-                    sb.append("\t\t${reps[i]}x${eqRepsSum}x${weight[i]}\n")
+                    sb.append("\t\t${reps[i]}x${eqRepsSum}x${weight[i]} @ ${rpe[i]}\n")
                     eqRepsSum = 1
                 }
             }

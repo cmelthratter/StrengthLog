@@ -19,10 +19,11 @@ import com.cmelthratter.strengthlog.R
  */
 
 
-class EntryInputDialog(val repsPlaceHolder: Int = 0, val weightPlaceHolder: Float = 0.0F) : DialogFragment() {
+class EntryInputDialog(val repsPlaceHolder: Int = 0, val weightPlaceHolder: Float = 0.0F, val rpePlaceHolder: Float = 0.0F) : DialogFragment() {
 
     lateinit var reps : EditText
     lateinit var weight : EditText
+    lateinit var rpe: EditText
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         log("Dialog created")
         val builder = AlertDialog.Builder(activity, R.style.DialogFragment)
@@ -36,8 +37,14 @@ class EntryInputDialog(val repsPlaceHolder: Int = 0, val weightPlaceHolder: Floa
         builder.setMessage(R.string.entry_input_desc)
                 .setPositiveButton(R.string.lift_dialog_submit, DialogInterface.OnClickListener { _, _ ->
                     log("Positive button clicked")
+                    var repsVal = 0
+                    var weightVal = 0.0F
+                    var rpeVal = 0.0F
+                    if (reps.text.toString() != "") repsVal = reps.text.toString().toInt()
+                    if (weight.text.toString() != "") weightVal = weight.text.toString().toFloat()
+                    if (rpe.text.toString() != "") rpeVal = rpe.text.toString().toFloat()
 
-                    mListener!!.onDialogPositiveClick(reps.text.toString().toInt(), weight.text.toString().toFloat() )
+                    mListener!!.onDialogPositiveClick(repsVal, weightVal, rpeVal)
 
                 })
                 .setNegativeButton(R.string.lift_dialog_cancel, DialogInterface.OnClickListener { dialog, _ ->
@@ -53,13 +60,15 @@ class EntryInputDialog(val repsPlaceHolder: Int = 0, val weightPlaceHolder: Floa
         super.onStart()
         reps = this.dialog.findViewById(R.id.reps_editText) as EditText
         weight = this.dialog.findViewById(R.id.weight_editText) as EditText
+        rpe = this.dialog.findViewById(R.id.rpe_editText) as EditText
 
         reps.setText(repsPlaceHolder.toString())
         weight.setText(weightPlaceHolder.toString())
+        rpe.setText(rpePlaceHolder.toString())
     }
 
     interface EntryDialogListener {
-        fun onDialogPositiveClick(reps : Int?, weight: Float?)
+        fun onDialogPositiveClick(reps : Int?, weight: Float?, rpe: Float?)
         fun onDialogNegativeClick()
     }
 
