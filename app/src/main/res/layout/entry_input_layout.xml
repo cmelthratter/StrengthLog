@@ -23,6 +23,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
+
     <EditText
         android:id="@+id/reps_editText"
         android:layout_width="131dp"
@@ -52,10 +53,35 @@
         android:id="@+id/weight_editText"
         android:layout_width="129dp"
         android:layout_height="50dp"
-        android:inputType="number"
+        android:inputType="numberDecimal"
         android:textColor="#FFFFFF"
         android:shadowColor="#FFFFFF"
         app:layout_constraintLeft_toLeftOf="parent"
         tools:layout_editor_absoluteY="25dp" />
+
+
+    <TextView
+        android:id="@+id/rpe_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="16dp"
+        android:labelFor="@+id/rpe_editText"
+        android:text="@string/rpe_editor_text_label"
+        android:textColor="#FFFFFF"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="328dp" />
+    <EditText
+        android:id="@+id/rpe_editText"
+        android:layout_width="131dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="41dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="number"
+        android:textColor="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@+id/weight_textView"
+        tools:layout_editor_absoluteX="98dp"
+        android:layout_weight="0.43" />
 
 </LinearLayout>

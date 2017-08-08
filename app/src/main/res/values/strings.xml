@@ -9,7 +9,7 @@
     <string name="lift_input_dialog_title">New Lift</string>
     <string name="lift_input_box">lift name</string>
     <string name="title_activity_entry">%s</string>
-    <string name="entry_set_label">Set</string>
+    <string name="entry_rpe_label">RPE</string>
     <string name="entry_reps_label">Reps</string>
     <string name="entry_weight_label">Weight</string>
     <string name="lift_label">%s</string>
@@ -18,6 +18,9 @@
     <string name="entry_input_title">New set</string>
     <string name="weight_editor_title">Edit Weight</string>
     <string name="weight_editor_desc">Enter a new weight for this set</string>
+    <string name="rpe_editor_text_label">RPE (Rate of Perceived Exertion)</string>
+    <string name="rpe_editor_title">RPE (Rate of Perceived Exertion)</string>
+    <string name="rpe_editor_desc">Enter your RPE for this set</string>
 
     <string name="reps_editor_title">Edit Reps</string>
     <string name="reps_editor_desc">Enter different reps for this set</string>
