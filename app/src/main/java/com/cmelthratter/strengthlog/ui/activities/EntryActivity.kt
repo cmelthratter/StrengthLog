@@ -1,17 +1,18 @@
 package com.cmelthratter.strengthlog.ui.activities
 
+import android.content.ClipData
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.*
 
 import com.cmelthratter.strengthlog.R
-import com.cmelthratter.strengthlog.ui.dialogs.EntryInputDialog
-import com.cmelthratter.strengthlog.ui.dialogs.RepsEditorDialog
-import com.cmelthratter.strengthlog.ui.dialogs.RpeEditorDialog
-import com.cmelthratter.strengthlog.ui.dialogs.WeightEditorDialog
+import com.cmelthratter.strengthlog.ui.dialogs.*
+import com.cmelthratter.strengthlog.ui.dialogs.DeleteConfirmDialog.DeleteDialogListener
 import com.cmelthratter.strengthlog.util.JsonHandler
 import com.cmelthratter.strengthlog.util.POSITION_KEY
 
@@ -22,7 +23,21 @@ const val RPE = 1
  * An activity for interacting with the list
  * of entries for a specified lift
  */
-class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener, RepsEditorDialog.RepsEditorDialogListener, RpeEditorDialog.EditorDialogListener{
+class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener,
+        RepsEditorDialog.RepsEditorDialogListener,
+        RpeEditorDialog.EditorDialogListener,
+        DeleteDialogListener{
+    override fun onDialogPositiveClick() {
+        currentEntry.rpe.removeAt(selectedPosition)
+        currentEntry.reps.removeAt(selectedPosition)
+        currentEntry.weight.removeAt(selectedPosition)
+        choiceMode = EDIT
+        currentMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+        rpeAdapter.notifyDataSetChanged()
+        repsAdapter.notifyDataSetChanged()
+        weightAdapter.notifyDataSetChanged()
+       toast("Removed set #$selectedPosition")
+    }
 
     val TAG = EntryActivity::class.java.simpleName
 
@@ -37,7 +52,33 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
     lateinit var weightAdapter : ArrayAdapter<Float>
     lateinit var jsonHandler : JsonHandler
     var selectedPosition : Int = -1
+    lateinit var currentMenuItem : MenuItem
+    var choiceMode : Int = VIEW
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.menu, menu)
+
+        return true
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle item selection
+        currentMenuItem = item
+        if (item.itemId != R.id.backup)
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+        when (item.itemId) {
+           R.id.delete -> {
+            choiceMode = DELETE
+            toast("Choose a lift to delete it" )
+            return true
+        } R.id.backup -> {
+            jsonHandler.writeLifts(true)
+            toast("Backing up lifts data file..")
+        }
+            else -> return super.onOptionsItemSelected(item)
+        }
+        return false
+    }
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
@@ -63,21 +104,49 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
 
         repsList.setOnItemClickListener { parent, view, position, id ->
 
-            val dialog = RepsEditorDialog()
-            dialog.show(fragmentManager, "RepsEditorDialog")
-            selectedPosition = position
+            when (choiceMode) {
+                EDIT -> {
+                    val dialog = RepsEditorDialog()
+                    dialog.show(fragmentManager, "RepsEditorDialog")
+                    selectedPosition = position
+                }
+                DELETE -> {
+                    val dialog = DeleteConfirmDialog()
+                    dialog.show(fragmentManager, "DeleteConfirmDialog")
+                    selectedPosition = position
+                }
+
+            }
         }
 
         weightList.setOnItemClickListener { parent, view, position, id ->
-            val dialog = WeightEditorDialog()
-            dialog.show(fragmentManager, "WeightEditorDialog")
-            selectedPosition = position
+            when (choiceMode) {
+                EDIT -> {
+                    val dialog = RepsEditorDialog()
+                    dialog.show(fragmentManager, "RepsEditorDialog")
+                    selectedPosition = position
+                }
+                DELETE -> {
+                    val dialog = DeleteConfirmDialog()
+                    dialog.show(fragmentManager, "DeleteConfirmDialog")
+                    selectedPosition = position
+                }
+            }
         }
 
         rpeList.setOnItemClickListener { parent, view, position, id ->
-            val dialog = RpeEditorDialog()
-            dialog.show(fragmentManager, "RpeEditorDialog")
-            selectedPosition = position
+            when (choiceMode) {
+                EDIT -> {
+                    val dialog = RepsEditorDialog()
+                    dialog.show(fragmentManager, "RepsEditorDialog")
+                    selectedPosition = position
+                }
+                DELETE -> {
+                    val dialog = DeleteConfirmDialog()
+                    dialog.show(fragmentManager, "DeleteConfirmDialog")
+                    selectedPosition = position
+                }
+            }
         }
 
         rpeAdapter = ArrayAdapter<Float>(this, android.R.layout.simple_list_item_1, currentEntry.rpe)
