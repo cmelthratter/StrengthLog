@@ -53,7 +53,7 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
     lateinit var jsonHandler : JsonHandler
     var selectedPosition : Int = -1
     lateinit var currentMenuItem : MenuItem
-    var choiceMode : Int = VIEW
+    var choiceMode : Int = EDIT
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
@@ -122,8 +122,8 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
         weightList.setOnItemClickListener { parent, view, position, id ->
             when (choiceMode) {
                 EDIT -> {
-                    val dialog = RepsEditorDialog()
-                    dialog.show(fragmentManager, "RepsEditorDialog")
+                    val dialog = WeightEditorDialog()
+                    dialog.show(fragmentManager, "WeightEditorDialog")
                     selectedPosition = position
                 }
                 DELETE -> {
@@ -137,8 +137,8 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
         rpeList.setOnItemClickListener { parent, view, position, id ->
             when (choiceMode) {
                 EDIT -> {
-                    val dialog = RepsEditorDialog()
-                    dialog.show(fragmentManager, "RepsEditorDialog")
+                    val dialog = RpeEditorDialog()
+                    dialog.show(fragmentManager, "RpeEditorDialog")
                     selectedPosition = position
                 }
                 DELETE -> {

@@ -131,7 +131,7 @@ class Entry(var date: Date = Date(),
      * entry page
      */
     fun getFormattedDate(): String {
-        return SimpleDateFormat("EEEE, MMMM dd, yyyy", Locale.US).format(this.date)
+        return SimpleDateFormat("EEEE\n MMMM dd, yyyy", Locale.US).format(this.date)
     }
 
     /**
@@ -140,7 +140,11 @@ class Entry(var date: Date = Date(),
      */
     override fun toString(): String {
         val sb = StringBuilder(SimpleDateFormat("MM-dd-yy", Locale.US).format(date)).append(":\n")
-        if (weight.all { i -> i == weight[0] } && reps.all { i -> reps[0] == i } || reps.size == 1) {
+        if ((weight.all { i -> i == weight[0] } &&
+                reps.all { i -> reps[0] == i } &&
+                rpe.all {i -> i == rpe[0] }) ||
+                reps.size == 1) {
+
             if (rpe.isNotEmpty())
                 sb.append("\t\t\t${reps[0]}x${reps.size}x${weight[0]} @ ${rpe[0]}")
         } else {
@@ -228,7 +232,8 @@ class Entry(var date: Date = Date(),
                 changeLiftName(currentLift, newLift)
 
             choiceMode = VIEW
-            currentMenuItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT)
+            if (currentMenuItem != null)
+                currentMenuItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT)
         }
 
         /**
