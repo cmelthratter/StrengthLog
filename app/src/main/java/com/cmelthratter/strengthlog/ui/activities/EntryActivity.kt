@@ -57,7 +57,7 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
-        inflater.inflate(R.menu.menu, menu)
+        inflater.inflate(R.menu.entry_menu, menu)
 
         return true
     }
