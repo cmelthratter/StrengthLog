@@ -59,7 +59,7 @@ class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogL
             } R.id.delete -> {
             currentItem = item
                 choiceMode = DELETE
-                toast("Choose an entry to delete it")
+                toast("Choose an entry to delete")
                 currentItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
                 return true
             } R.id.backup -> {
@@ -93,7 +93,7 @@ class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogL
             when (choiceMode) {
 
                 VIEW -> {
-                    var intent = Intent(this, EntryActivity::class.java)
+                    val intent = Intent(this, EntryActivity::class.java)
                     intent.putExtra(POSITION_KEY, position)
                     jsonHandler.writeLifts()
                     startActivity(intent)
