@@ -8,6 +8,8 @@ import android.util.Log
 import android.widget.*
 
 import com.cmelthratter.strengthlog.R
+import com.cmelthratter.strengthlog.models.Entry
+import com.cmelthratter.strengthlog.models.Lift
 import com.cmelthratter.strengthlog.ui.dialogs.EntryInputDialog
 import com.cmelthratter.strengthlog.ui.dialogs.RepsEditorDialog
 import com.cmelthratter.strengthlog.ui.dialogs.RpeEditorDialog

@@ -17,6 +17,7 @@ import android.widget.ListView
 import android.widget.Toast
 
 import com.cmelthratter.strengthlog.R
+import com.cmelthratter.strengthlog.models.Entry
 import com.cmelthratter.strengthlog.ui.dialogs.DeleteConfirmDialog
 import com.cmelthratter.strengthlog.util.*
 import java.util.*
