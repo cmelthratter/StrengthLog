@@ -7,7 +7,6 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import com.cmelthratter.strengthlog.models.Lift
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -21,10 +20,12 @@ import com.cmelthratter.strengthlog.ui.dialogs.LiftInputDialog
 import com.cmelthratter.strengthlog.ui.dialogs.LiftInputDialog.LiftDialogListener
 import com.cmelthratter.strengthlog.util.JsonHandler
 import com.cmelthratter.strengthlog.util.LIFTS_KEY
+import com.cmelthratter.strengthlog.models.Lift
 
 import kotlin.collections.ArrayList
 import android.support.v7.widget.Toolbar
 import android.view.*
+import com.cmelthratter.strengthlog.controllers.LiftController
 import com.cmelthratter.strengthlog.ui.dialogs.DeleteConfirmDialog
 
 const val VIEW = 0
@@ -43,8 +44,8 @@ const val DELETE = 2
          */
         companion object {
 
-            var currentLift: Lift = Lift("null")
-            var liftList: ArrayList<Lift> = arrayListOf()
+            var currentLift: Lift? = Lift("null")
+            var liftList: kotlin.collections.ArrayList<Lift>? = arrayListOf()
         }
 
         private lateinit var listView: ListView
@@ -54,6 +55,7 @@ const val DELETE = 2
         private lateinit var jsonHandler: JsonHandler
         private var choiceMode = VIEW
         private var currentMenuItem : MenuItem? = null
+        private lateinit var liftController : LiftController
 
         override fun onCreateOptionsMenu(menu: Menu): Boolean {
             val inflater = menuInflater
@@ -92,9 +94,9 @@ const val DELETE = 2
         override fun onDialogPositiveClick(newLift: String, isNewLift: Boolean) {
             log("positive click: $newLift")
             if (isNewLift)
-                addLift(newLift)
+                liftController.addLift(newLift)
             else
-                changeLiftName(currentLift, newLift)
+                liftController.changeLiftName(currentLift!!, newLift)
 
             choiceMode = VIEW
             currentMenuItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT)
@@ -124,7 +126,7 @@ const val DELETE = 2
 
             requestPermissions()
             listView.setOnItemClickListener { parent, view, position, id ->
-                LiftActivity.currentLift = LiftActivity.liftList[position]
+                LiftActivity.currentLift = LiftActivity.liftList!![position]
                 when(choiceMode) {
                     VIEW -> {
                         val intent = Intent(this@LiftActivity, EntryListActivity::class.java)
@@ -133,7 +135,7 @@ const val DELETE = 2
                         startActivity(intent)
                     }
                     EDIT -> {
-                        val liftDialog: LiftInputDialog = LiftInputDialog(false, LiftActivity.currentLift.name)
+                        val liftDialog: LiftInputDialog = LiftInputDialog(false, LiftActivity.currentLift!!.name)
                         liftDialog.onAttach(this)
                         liftDialog.show(fragmentManager, "LiftInputDialog")
                     }
@@ -183,7 +185,7 @@ const val DELETE = 2
         }
 
         override fun onDialogPositiveClick() {
-            removeLift(currentLift)
+            liftController.removeLift(currentLift)
             choiceMode = VIEW
 
             currentMenuItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT)
@@ -203,6 +205,7 @@ const val DELETE = 2
         override fun onStop() {
             log("Activity stopped")
             super.onStop()
+            LiftActivity.liftList = liftController.liftList as ArrayList<Lift>
         }
 
         override fun onDestroy() {
@@ -210,50 +213,15 @@ const val DELETE = 2
             log("Activity destroyed")
         }
 
-        /**
-         * Changes the lift name of the Lift object
-         * @param lift the Lift to change
-         * @param newName  the new name to change the lift name to
-         */
-        fun changeLiftName(lift: Lift, newName: String) {
-            liftList[liftList.indexOf(lift)].name = newName
-            arrayAdapter.notifyDataSetChanged()
-        }
 
-        /**
-         * adds a new lift with the specified name to the
-         * lift list, the ArrayAdapter, and writes the new list
-         * to a files
-         * @param liftName the name of the lift to add
-         */
-        private fun addLift(liftName: String) {
-            log("Adding lift: $liftName")
-            val lift = Lift(liftName)
-            liftList.add(lift)
-            arrayAdapter.notifyDataSetChanged()
-            jsonHandler.writeLifts()
-        }
-
-        /**
-         * removes the specified lift from the lift list,
-         * ArrayAdapter, and writes the new lift list out
-         * to the json file
-         * @param lift the Lift to remove from the list
-         */
-        private fun removeLift(lift: Lift) {
-            log("removing lift $lift")
-            liftList.remove(lift)
-            arrayAdapter.notifyDataSetChanged()
-            jsonHandler.writeLifts()
-        }
 
         /**
          * calls readLifts() in the JsonHandler
          * and then updates the ArrayAdapter
          */
         private fun loadLifts() {
-            if (liftList.isEmpty()) {
-                jsonHandler.readLifts()
+            if (liftList!!.isEmpty()) {
+                LiftActivity.liftList!!.addAll(jsonHandler.readLifts())
                 arrayAdapter.notifyDataSetChanged()
             }
         }

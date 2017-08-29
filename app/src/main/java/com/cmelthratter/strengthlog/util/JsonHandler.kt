@@ -2,7 +2,7 @@ package com.cmelthratter.strengthlog.util
 
 import android.os.Environment
 import android.util.Log
-import com.cmelthratter.strengthlog.ui.activities.Lift
+import com.cmelthratter.strengthlog.models.Lift
 import com.cmelthratter.strengthlog.ui.activities.LiftActivity
 import com.google.gson.Gson
 import java.io.*
@@ -21,28 +21,28 @@ class JsonHandler(val file : File = File(Environment.getExternalStorageDirectory
      * reads the lift from file and sets the Global Lift List
      * to the result from file
      */
-    fun readLifts()  {
+    fun readLifts() : Array<out Lift>  {
 
         log("reading lifts")
         var reader: Scanner? = null
         try {
             if (!file.exists()) {
                 log("no file to read")
-                return
+                throw FileNotFoundException()
             }
             file.setReadable(true)
             reader = Scanner(file, "UTF-8")
             val data = reader.nextLine()
             val array = gson.fromJson(data, arrayOf<Lift>()::class.java)
             log("loadedlist: $array")
-            LiftActivity.liftList.addAll(array)
+            return array
         } catch (e: Exception) {
             Log.e(TAG, e.message)
         } finally {
             reader!!.close()
-
         }
 
+        return arrayOf()
     }
 
     /**
@@ -58,7 +58,7 @@ class JsonHandler(val file : File = File(Environment.getExternalStorageDirectory
             log("writing lifts")
             if (!file.exists()) file.createNewFile()
             file.setWritable(true)
-            val data = gson.toJson(LiftActivity.liftList.toArray())
+            val data = gson.toJson(LiftActivity.liftList!!.toArray())
             log("Writing string: $data")
             writer.println(data)
         } catch (e: Exception) {
