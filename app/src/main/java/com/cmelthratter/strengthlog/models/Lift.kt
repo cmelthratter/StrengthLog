@@ -26,26 +26,21 @@ class Lift (var name: String,
         dest?.writeTypedArray(entries.toTypedArray(), 0)
     }
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    override fun describeContents(): Int = 0
+
 
     companion object CREATOR : Parcelable.Creator<Lift> {
-        override fun createFromParcel(parcel: Parcel): Lift {
-            return Lift(parcel)
-        }
+        override fun createFromParcel(parcel: Parcel): Lift = Lift(parcel)
 
-        override fun newArray(size: Int): Array<Lift?> {
-            return arrayOfNulls(size)
-        }
+
+        override fun newArray(size: Int): Array<Lift?> = arrayOfNulls(size)
+
     }
 
-    override fun toString() : String {
-        return name
-    }
+    override fun toString() : String = name
 
-    fun getDates() : MutableList<String>{
-        return entries.map { entry -> SimpleDateFormat("MM:dd:yy", Locale.US).format(entry.date).toString() }.toMutableList()
-    }
+
+    fun getDates() : MutableList<String> = entries.map { entry -> SimpleDateFormat("MM:dd:yy", Locale.US).format(entry.date).toString() }.toMutableList()
+
 
 }

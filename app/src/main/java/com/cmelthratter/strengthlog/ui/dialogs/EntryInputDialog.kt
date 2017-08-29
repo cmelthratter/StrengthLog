@@ -19,7 +19,9 @@ import com.cmelthratter.strengthlog.R
  */
 
 
-class EntryInputDialog(val repsPlaceHolder: Int = 0, val weightPlaceHolder: Float = 0.0F, val rpePlaceHolder: Float = 0.0F) : DialogFragment() {
+class EntryInputDialog(val repsPlaceHolder: Int = 0,
+                       val weightPlaceHolder: Float = 0.0F,
+                       val rpePlaceHolder: Float = 0.0F) : DialogFragment() {
 
     lateinit var reps : EditText
     lateinit var weight : EditText
