@@ -4,7 +4,6 @@ import android.widget.ArrayAdapter
 import com.cmelthratter.strengthlog.models.Lift
 import com.cmelthratter.strengthlog.ui.activities.LiftActivity
 import com.cmelthratter.strengthlog.util.DataObserver
-import com.cmelthratter.strengthlog.util.JsonHandler
 
 /**
  * Created by Cody Melthratter on 28.8.17. A class for

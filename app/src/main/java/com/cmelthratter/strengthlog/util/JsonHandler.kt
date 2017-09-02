@@ -30,8 +30,7 @@ object JsonHandler  {
             var reader: Scanner? = null
             try {
                 if (!file.exists()) {
-                    log("no file to read")
-                    throw FileNotFoundException()
+                    throw FileNotFoundException("No file to read")
                 }
                 file.setReadable(true)
                 reader = Scanner(file, "UTF-8")
@@ -40,12 +39,12 @@ object JsonHandler  {
                 log("loadedlist: $array")
                 return array
             } catch (e: Exception) {
+                Log.e(TAG, "" + e.message)
                 return arrayOf()
             } finally {
                 reader!!.close()
             }
 
-            return arrayOf()
         }
 
         /**
@@ -80,7 +79,13 @@ object JsonHandler  {
 
 }
 
-class DataObserver() : DataSetObserver() {
+/**
+ * Simple class that allows us to create a new DataObserver that just
+ * calls JsonHandler.writeLifts() when the observed dataSet changes.
+ * This insures that no exceptions are thrown due to duplicate
+ * registers.
+ */
+class DataObserver : DataSetObserver() {
     override fun onChanged() {
         super.onChanged()
         JsonHandler.writeLifts()
