@@ -5,6 +5,7 @@ import android.app.DialogFragment
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.database.DataSetObserver
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
@@ -27,6 +28,7 @@ import android.support.v7.widget.Toolbar
 import android.view.*
 import com.cmelthratter.strengthlog.controllers.LiftController
 import com.cmelthratter.strengthlog.ui.dialogs.DeleteConfirmDialog
+import java.io.FileNotFoundException
 
 const val VIEW = 0
 const val EDIT =  1
@@ -52,7 +54,6 @@ const val DELETE = 2
         private lateinit var arrayAdapter: ArrayAdapter<Lift>
         private var permissionGranted = false
         private lateinit var prefs: SharedPreferences
-        private lateinit var jsonHandler: JsonHandler
         private var choiceMode = VIEW
         private var currentMenuItem : MenuItem? = null
         private lateinit var liftController : LiftController
@@ -79,7 +80,7 @@ const val DELETE = 2
                     toast("Choose a lift to delete it" )
                     return true
                 } R.id.backup -> {
-                    jsonHandler.writeLifts(true)
+                    JsonHandler.writeLifts(true)
                     toast("Backing up lifts data file..")
             }
                 else -> return super.onOptionsItemSelected(item)
@@ -99,6 +100,7 @@ const val DELETE = 2
                 liftController.changeLiftName(currentLift!!, newLift)
 
             choiceMode = VIEW
+            if (currentMenuItem == null) return
             currentMenuItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT)
         }
 
@@ -153,6 +155,7 @@ const val DELETE = 2
                 liftDialog.onAttach(this)
                 liftDialog.show(fragmentManager, "LiftInputDialog")
             })
+            liftController = LiftController(liftList!!, arrayAdapter)
         }
 
         /**
@@ -167,7 +170,6 @@ const val DELETE = 2
                             && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                         permissionGranted = true
                         log("Permisson granted: $permissionGranted")
-                        jsonHandler = JsonHandler()
                         loadLifts()
                     } else
                         toast("Request failed")
@@ -220,9 +222,14 @@ const val DELETE = 2
          * and then updates the ArrayAdapter
          */
         private fun loadLifts() {
-            if (liftList!!.isEmpty()) {
-                LiftActivity.liftList!!.addAll(jsonHandler.readLifts())
+            try {
+                if (liftList!!.isNotEmpty()) return
+                if (!permissionGranted) throw FileNotFoundException("Read/Write permissions not granted.")
+                LiftActivity.liftList!!.addAll(JsonHandler.readLifts())
+                liftController = LiftController(liftList!!, arrayAdapter)
                 arrayAdapter.notifyDataSetChanged()
+            }catch (e : Exception) {
+                Log.e(TAG, "" + e.message)
             }
         }
 
@@ -247,7 +254,6 @@ const val DELETE = 2
 
             } else {
                 permissionGranted = true
-                jsonHandler = JsonHandler()
                 loadLifts()
             }
         }

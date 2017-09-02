@@ -8,6 +8,8 @@ import android.util.Log
 import android.widget.*
 
 import com.cmelthratter.strengthlog.R
+import com.cmelthratter.strengthlog.controllers.EntryController
+import com.cmelthratter.strengthlog.controllers.EntryListController
 import com.cmelthratter.strengthlog.models.Entry
 import com.cmelthratter.strengthlog.models.Lift
 import com.cmelthratter.strengthlog.ui.dialogs.EntryInputDialog
@@ -37,15 +39,14 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
     lateinit var rpeAdapter: ArrayAdapter<Float>
     lateinit var repsAdapter : ArrayAdapter<Int>
     lateinit var weightAdapter : ArrayAdapter<Float>
-    lateinit var jsonHandler : JsonHandler
+    lateinit var entryController : EntryController
     var selectedPosition : Int = -1
 
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry)
-        jsonHandler = JsonHandler()
-        currentLift = LiftActivity.currentLift
+        currentLift = LiftActivity.currentLift!!
         val entryPosition = intent.getIntExtra(POSITION_KEY, 0)
         currentEntry = currentLift.entries[entryPosition]
 
@@ -55,7 +56,7 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
         weightList = findViewById(R.id.weight_listView) as ListView
         dateLabel = findViewById(R.id.date_text_label) as TextView
         val toolbar = findViewById(R.id.entry_toolbar) as Toolbar
-        toolbar.title = LiftActivity.currentLift.name
+        toolbar.title = LiftActivity.currentLift!!.name
         setSupportActionBar(toolbar)
         if(currentEntry.rpe.size != currentEntry.reps.size) {
             currentEntry.rpe.clear()
@@ -105,6 +106,8 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
             dialog.show(fragmentManager, "EntryInputDialog")
 
         }
+
+        entryController = EntryController(currentEntry, repsAdapter, weightAdapter, rpeAdapter)
     }
 
     override fun onBackPressed() {
@@ -116,40 +119,34 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
     override fun onDialogPositiveClick(reps: Int?, weight: Float?, rpe: Float?) {
 
         if (reps == null)
-            repsAdapter.add(0)
+            entryController.addReps(0)
         else
-            repsAdapter.add(reps)
+            entryController.addReps(reps)
         if (weight == null)
-            weightAdapter.add(0.0F)
+            entryController.addWeight(0.0F)
         else
-            weightAdapter.add(weight)
+            entryController.addWeight(weight)
         if (rpe == null)
-            rpeAdapter.add(0.0F)
+            entryController.addRpe(0.0F)
         else
-            rpeAdapter.add(rpe)
+            entryController.addRpe(rpe)
 
-        jsonHandler.writeLifts()
 
     }
     override fun onDialogPositiveClick(newVal: Int) {
 
-        currentEntry.reps[selectedPosition] = newVal
+        entryController.setReps(selectedPosition, newVal)
         repsAdapter.notifyDataSetChanged()
-        jsonHandler.writeLifts()
     }
 
 
     override fun onDialogPositiveClick(newVal: Float, type: Int) {
         when(type) {
             WEIGHT -> {
-             currentEntry.weight[selectedPosition] = newVal
-             weightAdapter.notifyDataSetChanged()
-             jsonHandler.writeLifts()
+                entryController.setWeight(selectedPosition, newVal)
             }
             RPE -> {
-                currentEntry.rpe[selectedPosition] = newVal
-                weightAdapter.notifyDataSetChanged()
-                jsonHandler.writeLifts()
+                entryController.setRpe(selectedPosition, newVal)
             }
         }
     }

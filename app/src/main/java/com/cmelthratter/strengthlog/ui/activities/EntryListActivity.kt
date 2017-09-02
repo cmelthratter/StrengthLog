@@ -26,9 +26,7 @@ import java.util.*
 
 class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogListener {
     override fun onDialogPositiveClick() {
-        LiftActivity.currentLift!!.entries.removeAt(currentPosition)
-        arrayAdapter.notifyDataSetChanged()
-        jsonHandler.writeLifts()
+        entryListController.removeEntry(currentPosition)
         choiceMode = VIEW
     }
 
@@ -38,7 +36,6 @@ class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogL
 
     lateinit var entryListView : ListView
     lateinit var arrayAdapter : ArrayAdapter<Entry>
-    lateinit var jsonHandler : JsonHandler
     lateinit var entryListController : EntryListController
     var currentPosition = 0
     var choiceMode = VIEW
@@ -66,7 +63,7 @@ class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogL
                 currentItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
                 return true
             } R.id.backup -> {
-                jsonHandler.writeLifts(true)
+                JsonHandler.writeLifts(true)
                 toast("Backing up lifts data file..")
                 return true
             }
@@ -79,7 +76,6 @@ class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogL
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry_list)
-        jsonHandler = JsonHandler()
         val toolbar = findViewById(R.id.entry_list_toolbar) as Toolbar
 
         toolbar.title = String.format(Locale.US, getString(R.string.title_activity_entry_list), LiftActivity.currentLift!!.name)
@@ -98,7 +94,7 @@ class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogL
                 VIEW -> {
                     val intent = Intent(this, EntryActivity::class.java)
                     intent.putExtra(POSITION_KEY, position)
-                    jsonHandler.writeLifts()
+                    JsonHandler.writeLifts()
                     startActivity(intent)
                 }
                 EDIT -> {
@@ -123,8 +119,9 @@ class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogL
                     currentItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT)
                 }
             }
-            entryListController = EntryListController(LiftActivity.currentLift!!.entries)
         }
+
+        entryListController = EntryListController(LiftActivity.currentLift!!.entries, arrayAdapter)
         fab.setOnClickListener(View.OnClickListener { view ->
             entryListController.addEntry()
             Toast.makeText(this, "New entry added for ${LiftActivity.currentLift}", Toast.LENGTH_SHORT).show()

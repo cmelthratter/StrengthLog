@@ -1,15 +1,21 @@
 package com.cmelthratter.strengthlog.controllers
 
+import android.widget.ArrayAdapter
 import com.cmelthratter.strengthlog.models.Lift
 import com.cmelthratter.strengthlog.ui.activities.LiftActivity
+import com.cmelthratter.strengthlog.util.DataObserver
+import com.cmelthratter.strengthlog.util.JsonHandler
 
 /**
  * Created by Cody Melthratter on 28.8.17. A class for
  * controlling (creating, modifying, removing) Lifts and
  * A Lift List.
  */
-class LiftController(var liftList : List<Lift>) {
-
+class LiftController(var liftList : List<Lift>,
+                     var adapter : ArrayAdapter<Lift>) {
+    init {
+        adapter.registerDataSetObserver(DataObserver())
+    }
 
     /**
      * Changes the lift name of the Lift object
@@ -18,6 +24,7 @@ class LiftController(var liftList : List<Lift>) {
      */
     fun changeLiftName(lift: Lift, newName: String) {
         liftList[LiftActivity.liftList!!.indexOf(lift)].name = newName
+        adapter.notifyDataSetChanged()
     }
 
     /**
@@ -30,6 +37,7 @@ class LiftController(var liftList : List<Lift>) {
 
         val lift = Lift(liftName)
         LiftActivity.liftList!!.add(lift)
+        adapter.notifyDataSetChanged()
     }
 
     /**
@@ -41,6 +49,7 @@ class LiftController(var liftList : List<Lift>) {
     fun removeLift(lift: Lift?) {
 
         LiftActivity.liftList!!.remove(lift)
+        adapter.notifyDataSetChanged()
     }
 
 }
