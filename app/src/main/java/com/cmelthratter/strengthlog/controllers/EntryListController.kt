@@ -21,7 +21,7 @@ class EntryListController(var entries: ArrayList<Entry>,
 
 
     fun addEntry() {
-        adapter.insert(Entry(), 0)
+        entries.add(0, Entry())
         adapter.notifyDataSetChanged()
     }
 
