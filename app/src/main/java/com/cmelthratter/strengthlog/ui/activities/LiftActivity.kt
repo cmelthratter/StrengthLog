@@ -5,7 +5,6 @@ import android.app.DialogFragment
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.database.DataSetObserver
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
@@ -60,7 +59,7 @@ const val DELETE = 2
 
         override fun onCreateOptionsMenu(menu: Menu): Boolean {
             val inflater = menuInflater
-            inflater.inflate(R.menu.menu, menu)
+            inflater.inflate(R.menu.default_menu, menu)
 
             return true
         }

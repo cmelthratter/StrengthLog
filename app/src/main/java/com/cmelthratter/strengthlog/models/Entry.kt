@@ -50,7 +50,7 @@ class Entry(var date: Date = Date(),
      * returns a formatted date to be displayed in the
      * entry page
      */
-    fun getFormattedDate(): String = SimpleDateFormat("EEEE, MMMM dd, yyyy", Locale.US).format(this.date)
+    fun getFormattedDate(): String = SimpleDateFormat("EEE, MMM dd, yyyy", Locale.US).format(this.date)
 
     override fun toString(): String {
         val sb = StringBuilder(SimpleDateFormat("MM-dd-yy", Locale.US).format(date)).append(":\n")

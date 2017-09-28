@@ -50,6 +50,17 @@ class EntryController(var entry: Entry,
         rpeAdapter.notifyDataSetChanged()
     }
 
+    fun removeSet(index: Int) {
+
+        entry.reps.removeAt(index)
+        entry.weight.removeAt(index)
+        entry.rpe.removeAt(index)
+
+        repsAdapter.notifyDataSetChanged()
+        weightAdapter.notifyDataSetChanged()
+        rpeAdapter.notifyDataSetChanged()
+    }
+
 
     fun setReps(index: Int, value: Int) {
         entry.reps[index] = value

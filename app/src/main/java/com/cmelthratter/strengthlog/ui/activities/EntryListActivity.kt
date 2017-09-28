@@ -43,7 +43,7 @@ class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogL
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
-        inflater.inflate(R.menu.menu, menu)
+        inflater.inflate(R.menu.default_menu, menu)
         return true
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
