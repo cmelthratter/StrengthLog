@@ -17,3 +17,6 @@ const val JSON_FILE_NAME = "/lifts_data.json"
 const val CURRENT_ENTRY_KEY = "CURRENT_ENTRY_KEY"
 const val POSITION_KEY = "POSITION_KEY"
 const val BACKUP_FILE_EXT = ".bak"
+const val CSV_FILE_NAME = "lifts.csv"
+
+const val CSV_HEADERS = "Lift,Date,Reps,Weight,RPE"

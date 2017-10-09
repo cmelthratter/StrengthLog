@@ -57,6 +57,8 @@ const val DELETE = 2
         private var currentMenuItem : MenuItem? = null
         private lateinit var liftController : LiftController
 
+        val TAG = LiftActivity::class.java.simpleName
+
         override fun onCreateOptionsMenu(menu: Menu): Boolean {
             val inflater = menuInflater
             inflater.inflate(R.menu.default_menu, menu)
@@ -87,7 +89,6 @@ const val DELETE = 2
             return false
         }
 
-        val TAG = LiftActivity::class.java.simpleName
         /**
          * handling positive response from the new Lift dialog
          */
