@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="500px"
+    android:layout_height="wrap_content"
+    android:background="@color/colorBackground"
+    android:baselineAligned="false"
+    android:orientation="vertical"
+    android:weightSum="1">
+
+
+    <TextView
+        android:id="@+id/reps_dialog_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autofillHints="@string/entry_format_hint"
+        android:labelFor="@+id/reps_editText"
+        android:text="@string/entry_string_format"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toTopOf="@+id/reps_editText"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/entry_input_string"
+        android:layout_width="245dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/entry_format_hint"
+        android:textColorHint="@color/colorAccent"
+        app:helperTextEnabled="false"
+        app:hintAnimationEnabled="false"
+        app:hintEnabled="false">
+
+        <android.support.design.widget.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/entry_format_hint" />
+    </android.support.design.widget.TextInputLayout>
+
+
+</LinearLayout>

@@ -33,4 +33,7 @@
     <string name="edit_lift_title">Edit Lift</string>
     <string name="edit_date_title">Edit Date</string>
     <string name="backup_menu_text">Backup</string>
+    <string name="entry_string_format">New Set/Sets</string>
+    <string name="entry_format_hint">[sets]x[reps]@[RPE]</string>
+    <string name="rpe_descirption">RPE - Rate of Percieved Exertion: A subjective rating of the difficulty of a set.</string>
 </resources>

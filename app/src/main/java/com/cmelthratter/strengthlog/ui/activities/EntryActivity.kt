@@ -165,13 +165,8 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
         log("$currentEntry")
         log("$entryPosition")
         fab.setOnClickListener {
-            var repsPlaceholder = 0
-            var weightPlaceholder = 0.0F
-            var rpePlaceHolder = 0.0F
-            if (currentEntry.reps.isNotEmpty()) repsPlaceholder = currentEntry.reps.last()
-            if (currentEntry.weight.isNotEmpty()) weightPlaceholder = currentEntry.weight.last()
-            if (currentEntry.rpe.isNotEmpty()) rpePlaceHolder = currentEntry.rpe.last()
-            val dialog = EntryInputDialog(repsPlaceholder, weightPlaceholder, rpePlaceHolder)
+
+            val dialog = EntryInputDialog()
             dialog.show(supportFragmentManager, "EntryInputDialog")
 
         }
@@ -183,22 +178,23 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
     }
 
 
-    override fun onDialogPositiveClick(reps: Int?, weight: Float?, rpe: Float?) {
+    override fun onDialogPositiveClick(reps: Int?, sets: Int?, weight: Float?, rpe: Float?) {
+        for (i in 0..sets!!) {
+            if (reps == null)
+                repsAdapter.add(0)
+            else
+                repsAdapter.add(reps)
+            if (weight == null)
+                weightAdapter.add(0.0F)
+            else
+                weightAdapter.add(weight)
+            if (rpe == null)
+                rpeAdapter.add(0.0F)
+            else
+                rpeAdapter.add(rpe)
+        }
 
-        if (reps == null)
-            repsAdapter.add(0)
-        else
-            repsAdapter.add(reps)
-        if (weight == null)
-            weightAdapter.add(0.0F)
-        else
-            weightAdapter.add(weight)
-        if (rpe == null)
-            rpeAdapter.add(0.0F)
-        else
-            rpeAdapter.add(rpe)
-
-        JsonHandler.writeLifts()
+        //JsonHandler.writeLifts()
 
     }
     override fun onDialogPositiveClick(newVal: Int) {

@@ -6,11 +6,14 @@ import android.app.Dialog
 import android.support.v4.app.DialogFragment
 import android.content.DialogInterface
 import android.os.Bundle
+import android.support.design.widget.TextInputLayout
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import com.cmelthratter.strengthlog.R
+import com.cmelthratter.strengthlog.ui.activities.LiftActivity
 
 /**
  * Created by Cody Melthratter on 7/19/2017.
@@ -18,19 +21,15 @@ import com.cmelthratter.strengthlog.R
  */
 
 //TODO: fix this
-class EntryInputDialog (val repsPlaceHolder: Int = 0,
-                       val weightPlaceHolder: Float = 0.0F,
-                       val rpePlaceHolder: Float = 0.0F) : DialogFragment() {
+class EntryInputDialog () : DialogFragment() {
 
-    lateinit var reps : EditText
-    lateinit var weight : EditText
-    lateinit var rpe: EditText
+    lateinit var text: TextInputLayout
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         log("Dialog created")
         val builder = AlertDialog.Builder(activity, R.style.DialogFragment)
         val title = TextView(context)
         val linf = LayoutInflater.from(this.context)
-        val inflator = linf.inflate(R.layout.entry_input_layout, null)
+        val inflator = linf.inflate(R.layout.entry_input_layout_alt, null)
         title.setText(R.string.entry_input_title)
         builder.setCustomTitle(title)
         builder.setView(inflator)
@@ -38,14 +37,32 @@ class EntryInputDialog (val repsPlaceHolder: Int = 0,
         builder.setMessage(R.string.entry_input_desc)
                 .setPositiveButton(R.string.lift_dialog_submit, DialogInterface.OnClickListener { _, _ ->
                     log("Positive button clicked")
-                    var repsVal = 0
-                    var weightVal = 0.0F
-                    var rpeVal = 0.0F
-                    if (reps.text.toString() != "") repsVal = reps.text.toString().toInt()
-                    if (weight.text.toString() != "") weightVal = weight.text.toString().toFloat()
-                    if (rpe.text.toString() != "") rpeVal = rpe.text.toString().toFloat()
+                    val textVal = text.editText.toString()
+                    if (!textVal.matches(Regex("([0-9]x)*([0-9]x)*[0-9]+@[0-9]"))) {
+                        log("invalid input")
+                        toast("Invalid input")
+                    }
+                    val numX = textVal.count({c -> c == 'x'})
+                    var setsIndex = -1
+                    if (numX == 2)
+                        setsIndex =  textVal.indexOf ('x' )
 
-                    mListener!!.onDialogPositiveClick(repsVal, weightVal, rpeVal)
+                    var repsIndex = -1
+                    if (numX > 0)
+                        textVal.indexOf('x', setsIndex + 1)
+                    var weightIndex = 0
+                    if (numX > 0)
+                        weightIndex = textVal.indexOf('x', repsIndex + 1)
+                    val atSymbol = textVal.indexOf('@')
+                    var setsVal = 1
+                    if (numX == 2)
+                        setsVal = textVal.substring(0, repsIndex - 1).toInt()
+                    var repsVal = 1
+                    if (numX > 0)
+                        repsVal = textVal.substring(repsIndex + 1, weightIndex - 1).toInt()
+                    val weightVal = textVal.substring(weightIndex + 1, atSymbol - 1).toFloat()
+                    val rpeVal = textVal.substring(atSymbol + 1).toFloat()
+                    mListener!!.onDialogPositiveClick(repsVal, setsVal, weightVal, rpeVal)
 
                 })
                 .setNegativeButton(R.string.lift_dialog_cancel, DialogInterface.OnClickListener { dialog, _ ->
@@ -59,17 +76,13 @@ class EntryInputDialog (val repsPlaceHolder: Int = 0,
 
     override fun onStart() {
         super.onStart()
-        reps = this.dialog.findViewById(R.id.reps_editText) as EditText
-        weight = this.dialog.findViewById(R.id.weight_editText) as EditText
-        rpe = this.dialog.findViewById(R.id.rpe_editText) as EditText
+        text = this.dialog.findViewById(R.id.entry_input_string)
 
-        reps.setText(repsPlaceHolder.toString())
-        weight.setText(weightPlaceHolder.toString())
-        rpe.setText(rpePlaceHolder.toString())
+
     }
 
     interface EntryDialogListener {
-        fun onDialogPositiveClick(reps : Int?, weight: Float?, rpe: Float?)
+        fun onDialogPositiveClick(reps : Int?, sets : Int?, weight: Float?, rpe: Float?)
         fun onDialogNegativeClick()
     }
 
@@ -91,4 +104,11 @@ class EntryInputDialog (val repsPlaceHolder: Int = 0,
     fun log(msg: String) {
         Log.i(LiftInputDialog::class.java.simpleName, msg)
     }
+    /** displays a short Toast message
+    * @param msg the message to display
+    */
+    private fun toast(msg: String) {
+        Toast.makeText(this.context, msg, Toast.LENGTH_SHORT).show()
+    }
+
 }
