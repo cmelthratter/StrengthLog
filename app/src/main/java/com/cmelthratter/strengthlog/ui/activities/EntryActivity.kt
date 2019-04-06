@@ -1,5 +1,6 @@
 package com.cmelthratter.strengthlog.ui.activities
 
+import android.content.ClipData
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
@@ -10,11 +11,8 @@ import android.view.MenuItem
 import android.widget.*
 
 import com.cmelthratter.strengthlog.R
-import com.cmelthratter.strengthlog.controllers.EntryController
-import com.cmelthratter.strengthlog.controllers.EntryListController
-import com.cmelthratter.strengthlog.models.Entry
-import com.cmelthratter.strengthlog.models.Lift
 import com.cmelthratter.strengthlog.ui.dialogs.*
+import com.cmelthratter.strengthlog.ui.dialogs.DeleteConfirmDialog.DeleteDialogListener
 import com.cmelthratter.strengthlog.util.JsonHandler
 import com.cmelthratter.strengthlog.util.POSITION_KEY
 
@@ -25,11 +23,21 @@ const val RPE = 1
  * An activity for interacting with the list
  * of entries for a specified lift
  */
-class EntryActivity : AppCompatActivity() ,
-        EntryInputDialog.EntryDialogListener,
+class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener,
         RepsEditorDialog.RepsEditorDialogListener,
         RpeEditorDialog.EditorDialogListener,
-        DeleteConfirmDialog.DeleteDialogListener {
+        DeleteDialogListener{
+    override fun onDialogPositiveClick() {
+        currentEntry.rpe.removeAt(selectedPosition)
+        currentEntry.reps.removeAt(selectedPosition)
+        currentEntry.weight.removeAt(selectedPosition)
+        choiceMode = EDIT
+        currentMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+        rpeAdapter.notifyDataSetChanged()
+        repsAdapter.notifyDataSetChanged()
+        weightAdapter.notifyDataSetChanged()
+       toast("Removed set #$selectedPosition")
+    }
 
     val TAG = EntryActivity::class.java.simpleName
 
@@ -42,40 +50,41 @@ class EntryActivity : AppCompatActivity() ,
     lateinit var rpeAdapter: ArrayAdapter<Float>
     lateinit var repsAdapter : ArrayAdapter<Int>
     lateinit var weightAdapter : ArrayAdapter<Float>
-    lateinit var entryController : EntryController
+    lateinit var jsonHandler : JsonHandler
     var selectedPosition : Int = -1
-    var currentItem : MenuItem? = null
-    var choiceMode = VIEW
+    lateinit var currentMenuItem : MenuItem
+    var choiceMode : Int = EDIT
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
-        inflater.inflate(R.menu.entry_activity_menu, menu)
+        inflater.inflate(R.menu.entry_menu, menu)
+
         return true
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle item selection
-
+        currentMenuItem = item
+        if (item.itemId != R.id.backup)
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
         when (item.itemId) {
-            R.id.delete -> {
-            currentItem = item
+           R.id.delete -> {
             choiceMode = DELETE
-            toast("Choose an set to delete")
-            currentItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+            toast("Choose a lift to delete it" )
             return true
         } R.id.backup -> {
-            JsonHandler.writeLifts(true)
+            jsonHandler.writeLifts(true)
             toast("Backing up lifts data file..")
-            return true
         }
             else -> return super.onOptionsItemSelected(item)
         }
+        return false
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry)
-        currentLift = LiftActivity.currentLift!!
+        jsonHandler = JsonHandler()
+        currentLift = LiftActivity.currentLift
         val entryPosition = intent.getIntExtra(POSITION_KEY, 0)
         currentEntry = currentLift.entries[entryPosition]
 
@@ -85,7 +94,7 @@ class EntryActivity : AppCompatActivity() ,
         weightList = findViewById(R.id.weight_listView) as ListView
         dateLabel = findViewById(R.id.date_text_label) as TextView
         val toolbar = findViewById(R.id.entry_toolbar) as Toolbar
-        toolbar.title = LiftActivity.currentLift!!.name
+        toolbar.title = LiftActivity.currentLift.name
         setSupportActionBar(toolbar)
         if(currentEntry.rpe.size != currentEntry.reps.size) {
             currentEntry.rpe.clear()
@@ -94,63 +103,55 @@ class EntryActivity : AppCompatActivity() ,
 
 
         repsList.setOnItemClickListener { parent, view, position, id ->
-            when(choiceMode) {
-                 VIEW -> {
-                     val dialog = RepsEditorDialog()
-                     dialog.show(fragmentManager, "RepsEditorDialog")
-                     selectedPosition = position
-                 }
-                DELETE -> {
-                    val deleteDialog = DeleteConfirmDialog()
-                    deleteDialog.onAttach(this)
-                    deleteDialog.show(fragmentManager, "DeleteConfirmDialog")
-                    currentItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT)
+
+            when (choiceMode) {
+                EDIT -> {
+                    val dialog = RepsEditorDialog()
+                    dialog.show(fragmentManager, "RepsEditorDialog")
                     selectedPosition = position
                 }
+                DELETE -> {
+                    val dialog = DeleteConfirmDialog()
+                    dialog.show(fragmentManager, "DeleteConfirmDialog")
+                    selectedPosition = position
+                }
+
             }
         }
 
         weightList.setOnItemClickListener { parent, view, position, id ->
-
-            when(choiceMode) {
-                VIEW -> {
+            when (choiceMode) {
+                EDIT -> {
                     val dialog = WeightEditorDialog()
                     dialog.show(fragmentManager, "WeightEditorDialog")
                     selectedPosition = position
                 }
                 DELETE -> {
-                    val deleteDialog = DeleteConfirmDialog()
-                    deleteDialog.onAttach(this)
-                    deleteDialog.show(fragmentManager, "DeleteConfirmDialog")
-                    currentItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT)
+                    val dialog = DeleteConfirmDialog()
+                    dialog.show(fragmentManager, "DeleteConfirmDialog")
                     selectedPosition = position
                 }
             }
         }
 
         rpeList.setOnItemClickListener { parent, view, position, id ->
-
-            when(choiceMode) {
-                VIEW -> {
-
+            when (choiceMode) {
+                EDIT -> {
                     val dialog = RpeEditorDialog()
                     dialog.show(fragmentManager, "RpeEditorDialog")
                     selectedPosition = position
                 }
-
                 DELETE -> {
-                    val deleteDialog = DeleteConfirmDialog()
-                    deleteDialog.onAttach(this)
-                    deleteDialog.show(fragmentManager, "DeleteConfirmDialog")
-                    currentItem!!.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT)
+                    val dialog = DeleteConfirmDialog()
+                    dialog.show(fragmentManager, "DeleteConfirmDialog")
                     selectedPosition = position
                 }
             }
         }
 
-        rpeAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, currentEntry.rpe)
-        repsAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, currentEntry.reps)
-        weightAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, currentEntry.weight)
+        rpeAdapter = ArrayAdapter<Float>(this, android.R.layout.simple_list_item_1, currentEntry.rpe)
+        repsAdapter = ArrayAdapter<Int>(this, android.R.layout.simple_list_item_1, currentEntry.reps)
+        weightAdapter = ArrayAdapter<Float>(this, android.R.layout.simple_list_item_1, currentEntry.weight)
 
         rpeList.adapter = rpeAdapter
         repsList.adapter = repsAdapter
@@ -171,54 +172,53 @@ class EntryActivity : AppCompatActivity() ,
             dialog.show(fragmentManager, "EntryInputDialog")
 
         }
-
-        entryController = EntryController(currentEntry, repsAdapter, weightAdapter, rpeAdapter)
     }
 
     override fun onBackPressed() {
 
         super.onBackPressed()
-        choiceMode = VIEW
     }
 
 
     override fun onDialogPositiveClick(reps: Int?, weight: Float?, rpe: Float?) {
 
         if (reps == null)
-            entryController.addReps(0)
+            repsAdapter.add(0)
         else
-            entryController.addReps(reps)
+            repsAdapter.add(reps)
         if (weight == null)
-            entryController.addWeight(0.0F)
+            weightAdapter.add(0.0F)
         else
-            entryController.addWeight(weight)
+            weightAdapter.add(weight)
         if (rpe == null)
-            entryController.addRpe(0.0F)
+            rpeAdapter.add(0.0F)
         else
-            entryController.addRpe(rpe)
+            rpeAdapter.add(rpe)
 
+        jsonHandler.writeLifts()
 
     }
     override fun onDialogPositiveClick(newVal: Int) {
 
-        entryController.setReps(selectedPosition, newVal)
+        currentEntry.reps[selectedPosition] = newVal
         repsAdapter.notifyDataSetChanged()
+        jsonHandler.writeLifts()
     }
 
 
     override fun onDialogPositiveClick(newVal: Float, type: Int) {
         when(type) {
             WEIGHT -> {
-                entryController.setWeight(selectedPosition, newVal)
+             currentEntry.weight[selectedPosition] = newVal
+             weightAdapter.notifyDataSetChanged()
+             jsonHandler.writeLifts()
             }
             RPE -> {
-                entryController.setRpe(selectedPosition, newVal)
+                currentEntry.rpe[selectedPosition] = newVal
+                weightAdapter.notifyDataSetChanged()
+                jsonHandler.writeLifts()
             }
         }
-    }
-
-    override fun onDialogPositiveClick() {
-        entryController.removeSet(selectedPosition)
     }
 
     override fun onDialogNegativeClick() {
