@@ -3,13 +3,12 @@ package com.cmelthratter.strengthlog.ui.dialogs
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
-import android.app.DialogFragment
+import android.support.v4.app.DialogFragment
 import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.EditText
-import android.widget.NumberPicker
 import android.widget.TextView
 import com.cmelthratter.strengthlog.R
 
@@ -18,8 +17,8 @@ import com.cmelthratter.strengthlog.R
  * For recieving input for a new set in an entry
  */
 
-
-class EntryInputDialog(val repsPlaceHolder: Int = 0,
+//TODO: fix this
+class EntryInputDialog (val repsPlaceHolder: Int = 0,
                        val weightPlaceHolder: Float = 0.0F,
                        val rpePlaceHolder: Float = 0.0F) : DialogFragment() {
 
@@ -77,17 +76,14 @@ class EntryInputDialog(val repsPlaceHolder: Int = 0,
     // Use this instance of the interface to deliver action events
     var mListener: EntryDialogListener? = null
 
-    // Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
+   //TODO: refactor this to use (remove?)
     override fun onAttach(activity: Activity) {
         super.onAttach(activity)
         log("Activity attached: $activity")
-        // Verify that the host activity implements the callback interface
         try {
-            // Instantiate the NoticeDialogListener so we can send events to the host
             mListener = activity as EntryDialogListener
         } catch (e: ClassCastException) {
-            // The activity doesn't implement the interface, throw exception
-            throw ClassCastException(activity.toString() + " must implement NoticeDialogListener")
+            throw ClassCastException("$activity must implement NoticeDialogListener")
         }
 
     }

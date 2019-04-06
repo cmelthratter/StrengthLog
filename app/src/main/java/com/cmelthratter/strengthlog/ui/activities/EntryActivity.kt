@@ -1,16 +1,20 @@
 package com.cmelthratter.strengthlog.ui.activities
 
-import android.content.ClipData
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+
 import android.widget.*
 
 import com.cmelthratter.strengthlog.R
+import com.cmelthratter.strengthlog.models.Lift
+import com.cmelthratter.strengthlog.models.Entry
 import com.cmelthratter.strengthlog.ui.dialogs.*
 import com.cmelthratter.strengthlog.ui.dialogs.DeleteConfirmDialog.DeleteDialogListener
 import com.cmelthratter.strengthlog.util.JsonHandler
@@ -83,18 +87,17 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry)
-        jsonHandler = JsonHandler()
-        currentLift = LiftActivity.currentLift
+        currentLift = LiftActivity.currentLift!!
         val entryPosition = intent.getIntExtra(POSITION_KEY, 0)
         currentEntry = currentLift.entries[entryPosition]
 
-        val fab = findViewById(R.id.entry_fab) as FloatingActionButton
-        rpeList = findViewById(R.id.rpe_listView) as ListView
-        repsList = findViewById(R.id.reps_listView) as ListView
-        weightList = findViewById(R.id.weight_listView) as ListView
-        dateLabel = findViewById(R.id.date_text_label) as TextView
-        val toolbar = findViewById(R.id.entry_toolbar) as Toolbar
-        toolbar.title = LiftActivity.currentLift.name
+        val fab = findViewById<FloatingActionButton>(R.id.entry_fab)
+        rpeList = findViewById(R.id.rpe_listView)
+        repsList = findViewById(R.id.reps_listView)
+        weightList = findViewById(R.id.weight_listView)
+        dateLabel = findViewById(R.id.date_text_label)
+        val toolbar = findViewById<Toolbar>(R.id.entry_toolbar)
+        toolbar.title = LiftActivity.currentLift!!.name
         setSupportActionBar(toolbar)
         if(currentEntry.rpe.size != currentEntry.reps.size) {
             currentEntry.rpe.clear()
@@ -102,7 +105,7 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
         }
 
 
-        repsList.setOnItemClickListener { parent, view, position, id ->
+        repsList.setOnItemClickListener { _, _, position, _ ->
 
             when (choiceMode) {
                 EDIT -> {
@@ -119,7 +122,7 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
             }
         }
 
-        weightList.setOnItemClickListener { parent, view, position, id ->
+        weightList.setOnItemClickListener { _, _, position, _ ->
             when (choiceMode) {
                 EDIT -> {
                     val dialog = WeightEditorDialog()
@@ -134,7 +137,7 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
             }
         }
 
-        rpeList.setOnItemClickListener { parent, view, position, id ->
+        rpeList.setOnItemClickListener { _, _, position, _ ->
             when (choiceMode) {
                 EDIT -> {
                     val dialog = RpeEditorDialog()
@@ -149,9 +152,9 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
             }
         }
 
-        rpeAdapter = ArrayAdapter<Float>(this, android.R.layout.simple_list_item_1, currentEntry.rpe)
-        repsAdapter = ArrayAdapter<Int>(this, android.R.layout.simple_list_item_1, currentEntry.reps)
-        weightAdapter = ArrayAdapter<Float>(this, android.R.layout.simple_list_item_1, currentEntry.weight)
+        rpeAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, currentEntry.rpe)
+        repsAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, currentEntry.reps)
+        weightAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, currentEntry.weight)
 
         rpeList.adapter = rpeAdapter
         repsList.adapter = repsAdapter
@@ -161,7 +164,7 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
                 currentEntry.getFormattedDate())
         log("$currentEntry")
         log("$entryPosition")
-        fab.setOnClickListener { view ->
+        fab.setOnClickListener {
             var repsPlaceholder = 0
             var weightPlaceholder = 0.0F
             var rpePlaceHolder = 0.0F
@@ -169,7 +172,7 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
             if (currentEntry.weight.isNotEmpty()) weightPlaceholder = currentEntry.weight.last()
             if (currentEntry.rpe.isNotEmpty()) rpePlaceHolder = currentEntry.rpe.last()
             val dialog = EntryInputDialog(repsPlaceholder, weightPlaceholder, rpePlaceHolder)
-            dialog.show(fragmentManager, "EntryInputDialog")
+            dialog.show(supportFragmentManager, "EntryInputDialog")
 
         }
     }
@@ -195,7 +198,7 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
         else
             rpeAdapter.add(rpe)
 
-        jsonHandler.writeLifts()
+        JsonHandler.writeLifts()
 
     }
     override fun onDialogPositiveClick(newVal: Int) {
