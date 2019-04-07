@@ -179,7 +179,7 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
 
 
     override fun onDialogPositiveClick(reps: Int?, sets: Int?, weight: Float?, rpe: Float?) {
-        for (i in 0..sets!!) {
+        for (i in 0 until sets!!) {
             if (reps == null)
                 repsAdapter.add(0)
             else

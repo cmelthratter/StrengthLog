@@ -14,6 +14,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.cmelthratter.strengthlog.R
 import com.cmelthratter.strengthlog.ui.activities.LiftActivity
+import java.util.*
 
 /**
  * Created by Cody Melthratter on 7/19/2017.
@@ -22,7 +23,7 @@ import com.cmelthratter.strengthlog.ui.activities.LiftActivity
 
 //TODO: fix this
 class EntryInputDialog () : DialogFragment() {
-
+    val TAG = LiftInputDialog::class.java.simpleName
     lateinit var text: TextInputLayout
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         log("Dialog created")
@@ -37,31 +38,48 @@ class EntryInputDialog () : DialogFragment() {
         builder.setMessage(R.string.entry_input_desc)
                 .setPositiveButton(R.string.lift_dialog_submit, DialogInterface.OnClickListener { _, _ ->
                     log("Positive button clicked")
-                    val textVal = text.editText.toString()
-                    if (!textVal.matches(Regex("([0-9]x)*([0-9]x)*[0-9]+@[0-9]"))) {
-                        log("invalid input")
+                    val textVal = text.editText!!.text.toString()
+                    log(textVal)
+                    var weightVal = 0.0F
+                    var rpeVal = 0.0F
+                    var repsVal = 0
+                    var setsVal = 0
+                    try {
+                        if (!textVal.matches(Regex("([0-9]*x){0,2}[0-9]+@[0-9]")))
+                            throw InputMismatchException("Invalid input")
+
+
+                        if (!textVal.contains('x') && textVal.contains('@')) {//this format: [weight]@[RPE]; sets and reps == 1
+                            val weightAndRPE = textVal.split('@')
+                            weightVal = weightAndRPE[0].toFloat()
+                            rpeVal = weightAndRPE[1].toFloat()
+                            repsVal = 1
+                            setsVal = 1
+
+                        } else {
+                            var tokens = textVal.split('x')
+
+                            //TODO: allow user to choose the notation in settings menu
+                            if (tokens.size == 3) {//This format: [weight]x[reps]x[sets]@[RPE]
+                                weightVal = tokens[0].toFloat()
+                                repsVal = tokens[1].toInt()
+                                val setsAndRPE = tokens[2].split('@')
+                                setsVal = setsAndRPE[0].toInt()
+                                rpeVal = setsAndRPE[1].toFloat()
+                            } else if (tokens.size == 2) {//This format: [weight]x[reps]@[RPE]; sets == 1
+                                weightVal = tokens[0].toFloat()
+                                val repsAndRPE = tokens[1].split('@')
+                                repsVal = repsAndRPE[0].toInt()
+                                rpeVal = repsAndRPE[1].toFloat()
+                                setsVal = 1
+                            } else if (tokens.size > 3 || tokens.isEmpty()) {
+                                throw InputMismatchException("invalid input")
+                            }
+                        }
+                    } catch (e: InputMismatchException) {
+                        Log.e(TAG, e.message)
                         toast("Invalid input")
                     }
-                    val numX = textVal.count({c -> c == 'x'})
-                    var setsIndex = -1
-                    if (numX == 2)
-                        setsIndex =  textVal.indexOf ('x' )
-
-                    var repsIndex = -1
-                    if (numX > 0)
-                        textVal.indexOf('x', setsIndex + 1)
-                    var weightIndex = 0
-                    if (numX > 0)
-                        weightIndex = textVal.indexOf('x', repsIndex + 1)
-                    val atSymbol = textVal.indexOf('@')
-                    var setsVal = 1
-                    if (numX == 2)
-                        setsVal = textVal.substring(0, repsIndex - 1).toInt()
-                    var repsVal = 1
-                    if (numX > 0)
-                        repsVal = textVal.substring(repsIndex + 1, weightIndex - 1).toInt()
-                    val weightVal = textVal.substring(weightIndex + 1, atSymbol - 1).toFloat()
-                    val rpeVal = textVal.substring(atSymbol + 1).toFloat()
                     mListener!!.onDialogPositiveClick(repsVal, setsVal, weightVal, rpeVal)
 
                 })
@@ -102,7 +120,7 @@ class EntryInputDialog () : DialogFragment() {
     }
 
     fun log(msg: String) {
-        Log.i(LiftInputDialog::class.java.simpleName, msg)
+        Log.i(TAG, msg)
     }
     /** displays a short Toast message
     * @param msg the message to display
