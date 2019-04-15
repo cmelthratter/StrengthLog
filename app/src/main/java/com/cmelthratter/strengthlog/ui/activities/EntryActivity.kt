@@ -199,7 +199,7 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
 
         currentEntry.reps[selectedPosition] = newVal
         repsAdapter.notifyDataSetChanged()
-        jsonHandler.writeLifts()
+        jsonHandler.writeLifts(false)
     }
 
 
@@ -208,12 +208,12 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
             WEIGHT -> {
              currentEntry.weight[selectedPosition] = newVal
              weightAdapter.notifyDataSetChanged()
-             jsonHandler.writeLifts()
+             jsonHandler.writeLifts(false)
             }
             RPE -> {
                 currentEntry.rpe[selectedPosition] = newVal
                 weightAdapter.notifyDataSetChanged()
-                jsonHandler.writeLifts()
+                jsonHandler.writeLifts(false)
             }
         }
     }

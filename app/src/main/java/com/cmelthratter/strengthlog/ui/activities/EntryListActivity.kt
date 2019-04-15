@@ -94,7 +94,7 @@ class EntryListActivity : AppCompatActivity(), DeleteConfirmDialog.DeleteDialogL
                 VIEW -> {
                     val intent = Intent(this, EntryActivity::class.java)
                     intent.putExtra(POSITION_KEY, position)
-                    JsonHandler.writeLifts()
+                    JsonHandler.writeLifts(false)
                     startActivity(intent)
                 }
                 EDIT -> {

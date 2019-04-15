@@ -3,9 +3,13 @@ package com.cmelthratter.strengthlog.util
 import android.database.DataSetObserver
 import android.os.Environment
 import android.util.Log
+
 import com.cmelthratter.strengthlog.models.Lift
 import com.cmelthratter.strengthlog.ui.activities.LiftActivity
+
+
 import com.google.gson.Gson
+
 import java.io.*
 import java.util.*
 
@@ -18,65 +22,106 @@ val TAG = JsonHandler::class.java.simpleName
  * Created by Cody Melthratter on 7/20/2017.
  * For reading and writing json strings to a file
  */
-object JsonHandler  {
+
+object JsonHandler {
 
         /**
          * reads the lift from file and sets the Global Lift List
          * to the result from file
          */
-        fun readLifts() : Array<out Lift>  {
-
-            log("reading lifts")
-            var reader: Scanner? = null
-            try {
-                if (!file.exists()) {
-                    throw FileNotFoundException("No file to read")
-                }
-                file.setReadable(true)
-                reader = Scanner(file, "UTF-8")
-                val data = reader.nextLine()
-                val array = gson.fromJson(data, arrayOf<Lift>()::class.java)
-                log("loadedlist: $array")
-                return array
-            } catch (e: Exception) {
-                Log.e(TAG, "" + e.message)
-                return arrayOf()
-            } finally {
-                reader!!.close()
-            }
+        fun writeLifts( backup: Boolean) {
+            val task = JsonTask(TASK_TYPE_WRITE)
+            task.backup = backup
+            val t = Thread(task)
+            t.start()
+            t.join()
 
         }
 
-        /**
-         * writes the lifts contained in the LiftActivity companion object
-         * @param backup true if writing to backup file, false otherwise
-         */
-        fun writeLifts(backup : Boolean = false) {
-
-            var writer: PrintWriter? = null
-            try {
-                if (backup) writer = PrintWriter(FileOutputStream(backupFile, false))
-                else writer = PrintWriter(FileOutputStream(file, false))
-                log("writing lifts")
-                if (!file.exists()) file.createNewFile()
-                file.setWritable(true)
-                val data = gson.toJson(LiftActivity.liftList!!.toArray())
-                log("Writing string: $data")
-                writer.println(data)
-            } catch (e: Exception) {
-                Log.e(TAG, e.message)
-            } finally {
-                writer!!.close()
-            }
+        fun readLifts() : Array<out Lift> {
+            val task = JsonTask(TASK_TYPE_READ)
+            val t = Thread(task)
+            t.start()
+            t.join()
+            return task.liftArray
 
         }
 
 
 
-    private fun log(msg: String) {
-            Log.i(TAG, msg)
+        private fun log(msg: String) {
+                Log.i(TAG, msg)
+        }
+
+}
+
+class JsonTask(val taskType : Int) : Runnable {
+    val TAG = JsonTask::class.java.simpleName
+    var backup = false
+    var readSuccessul = false
+    val liftArray : Array<Lift>
+        get() {
+            if (readSuccessul) return liftArray
+            else return arrayOf()
+        }
+    fun readLifts() : Array<out Lift>  {
+
+        log("reading lifts")
+        var reader: Scanner? = null
+        try {
+            if (!file.exists()) {
+                throw FileNotFoundException("No file to read")
+            }
+            file.setReadable(true)
+            reader = Scanner(file, "UTF-8")
+            val data = reader.nextLine()
+            val array = gson.fromJson(data, arrayOf<Lift>()::class.java)
+            log("loadedlist: $array")
+            readSuccessul = true
+            return array
+        } catch (e: Exception) {
+            Log.e(TAG, "" + e.message)
+            return arrayOf()
+        } finally {
+            reader!!.close()
+        }
+
     }
 
+    /**
+     * writes the lifts contained in the LiftActivity companion object
+     * @param backup true if writing to backup file, false otherwise
+     */
+    fun writeLifts(backup : Boolean = false) {
+
+        var writer: PrintWriter? = null
+        try {
+            if (backup) writer = PrintWriter(FileOutputStream(backupFile, false))
+            else writer = PrintWriter(FileOutputStream(file, false))
+            log("writing lifts")
+            if (!file.exists()) file.createNewFile()
+            file.setWritable(true)
+            val data = gson.toJson(LiftActivity.liftList!!.toArray())
+            log("Writing string: $data")
+            writer.println(data)
+        } catch (e: Exception) {
+            Log.e(TAG, e.message)
+        } finally {
+            writer!!.close()
+        }
+
+    }
+
+    override fun run() {
+        when(taskType) {
+            TASK_TYPE_WRITE -> writeLifts(backup)
+            TASK_TYPE_READ -> readLifts()
+        }
+    }
+
+    private fun log(msg: String) {
+        Log.i(TAG, msg)
+    }
 }
 
 /**
@@ -88,7 +133,7 @@ object JsonHandler  {
 class DataObserver : DataSetObserver() {
     override fun onChanged() {
         super.onChanged()
-        JsonHandler.writeLifts()
+        JsonHandler.writeLifts(false)
     }
 
     override fun onInvalidated() {

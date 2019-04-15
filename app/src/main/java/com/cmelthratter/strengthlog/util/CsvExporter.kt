@@ -7,10 +7,10 @@ import java.io.PrintWriter
 
 /**
  * Created by Cody Melthratter on 10/8/2017.
- * Object for handling the exporting of formatted .CSV files.
+ * Runnable object for handling the exporting of formatted .CSV files.
  */
 
-object CsvExporter {
+class CsvExporter(val list : List<Lift>) : Runnable{
 
     val TAG = CsvExporter::class.java.simpleName
     /**
@@ -18,7 +18,7 @@ object CsvExporter {
      * @param list the list to write
      * @return the File object created by this function
      */
-    fun writeCsvFile(list : List<Lift>) : File? {
+    private fun writeCsvFile(list : List<Lift>) {
         var file : File? = null
         try {
 
@@ -36,13 +36,15 @@ object CsvExporter {
                 writer.println()
             }
 
-            return file
 
         } catch (e : Exception) {
                 Log.e(TAG, e.message)
-                return null
         }
 
+    }
+
+    override fun run() {
+        writeCsvFile(list)
     }
 
 
