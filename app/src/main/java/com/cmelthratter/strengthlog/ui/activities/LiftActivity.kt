@@ -2,6 +2,7 @@ package com.cmelthratter.strengthlog.ui.activities
 
 import android.Manifest
 import android.app.DialogFragment
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -135,12 +136,12 @@ class LiftActivity : AppCompatActivity(), LiftDialogListener, DeleteConfirmDialo
                 }
                 EDIT -> {
                     val liftDialog: LiftInputDialog = LiftInputDialog(false, LiftActivity.currentLift!!.name)
-                    liftDialog.onAttach(this)
+                    liftDialog.onAttach(this as Context)
                     liftDialog.show(fragmentManager, "LiftInputDialog")
                 }
                 DELETE -> {
                     val deleteDialog = DeleteConfirmDialog()
-                    deleteDialog.onAttach(this)
+                    deleteDialog.onAttach(this as Context)
                     deleteDialog.show(fragmentManager, "DeleteConfirmDialog")
 
                 }

@@ -1,19 +1,17 @@
 package com.cmelthratter.strengthlog.ui.dialogs
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
 import android.support.v4.app.DialogFragment
 import android.content.DialogInterface
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
 import android.util.Log
 import android.view.LayoutInflater
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import com.cmelthratter.strengthlog.R
-import com.cmelthratter.strengthlog.ui.activities.LiftActivity
 import java.util.*
 
 /**
@@ -21,13 +19,15 @@ import java.util.*
  * For recieving input for a new set in an entry
  */
 
-//TODO: fix this
-class EntryInputDialog () : DialogFragment() {
+class EntryInputDialog  : DialogFragment() {
     val TAG = LiftInputDialog::class.java.simpleName
     lateinit var text: TextInputLayout
+
+    // Use this instance of the interface to deliver action events
+    var mListener: EntryDialogListener? = null
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         log("Dialog created")
-        val builder = AlertDialog.Builder(activity, R.style.DialogFragment)
+        val builder = AlertDialog.Builder(activity!!.applicationContext, R.style.DialogFragment)
         val title = TextView(context)
         val linf = LayoutInflater.from(this.context)
         val inflator = linf.inflate(R.layout.entry_input_layout_alt, null)
@@ -104,17 +104,14 @@ class EntryInputDialog () : DialogFragment() {
         fun onDialogNegativeClick()
     }
 
-    // Use this instance of the interface to deliver action events
-    var mListener: EntryDialogListener? = null
 
-   //TODO: refactor this to use (remove?)
-    override fun onAttach(activity: Activity) {
-        super.onAttach(activity)
-        log("Activity attached: $activity")
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        log("Activity attached: $context")
         try {
-            mListener = activity as EntryDialogListener
+            mListener = context as EntryDialogListener
         } catch (e: ClassCastException) {
-            throw ClassCastException("$activity must implement NoticeDialogListener")
+            throw ClassCastException("$context must implement NoticeDialogListener")
         }
 
     }

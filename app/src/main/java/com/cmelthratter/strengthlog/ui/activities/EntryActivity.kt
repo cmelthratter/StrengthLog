@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -30,7 +28,7 @@ const val RPE = 1
 class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener,
         RepsEditorDialog.RepsEditorDialogListener,
         RpeEditorDialog.EditorDialogListener,
-        DeleteDialogListener{
+        DeleteDialogListener {
     override fun onDialogPositiveClick() {
         currentEntry.rpe.removeAt(selectedPosition)
         currentEntry.reps.removeAt(selectedPosition)
@@ -167,7 +165,7 @@ class EntryActivity : AppCompatActivity() , EntryInputDialog.EntryDialogListener
         fab.setOnClickListener {
 
             val dialog = EntryInputDialog()
-            dialog.show(supportFragmentManager, "EntryInputDialog")
+            dialog.show(this.supportFragmentManager, "EntryInputDialog")
 
         }
     }
